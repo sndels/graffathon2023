@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
     std::vector<Shader> sceneShaders;
     sceneShaders.emplace_back("Basic", rocket, vertPath, RES_DIRECTORY "shader/basic_frag.glsl");
     sceneShaders.emplace_back("RayMarch", rocket, vertPath, RES_DIRECTORY "shader/ray_marching_frag.glsl");
+    sceneShaders.emplace_back("Mask", rocket, vertPath, RES_DIRECTORY "shader/mask_frag.glsl");
     Shader compositeShader("Composite", rocket, vertPath, RES_DIRECTORY "shader/composite_frag.glsl");
     Shader quadShader("Quad", rocket, vertPath, RES_DIRECTORY "shader/render_quad_frag.glsl");
 
@@ -190,7 +191,7 @@ int main(int argc, char *argv[])
 
             if (uiTimeS != currentTimeS)
                 AudioStream::getInstance().setTimeS(uiTimeS);
-        }   
+        }
 
         // Try reloading the shader every 0.5s
         if (reloadTime.getSeconds() > 0.5f) {
