@@ -4,6 +4,7 @@
 #include "2d_sdf.glsl"
 
 uniform vec3 dColor;
+uniform float dChar;
 
 out vec4 fragColor;
 
@@ -19,16 +20,20 @@ out vec4 fragColor;
 
     vec2 p = (uv * 2. - 1.);
     p.x *= ar;
-    p *= 10;
+    p *= 15;
     float r = .5;
 
     float d = INF;
 
     // Gridlines
     // if (fract(p.x) < .02 || fract(1. - p.x) < .02)
-    //     color = vec3(.8);
+    //     color = vec3(.1);
+    // if (abs(p.x - FONT_WIDTH / 2) < .02 || abs(p.x + FONT_WIDTH/ 2) < .02)
+    //     color = vec3(.8, .0, .0);
+    // if (abs(p.y - FONT_DESCENDERS) < .02)
+    //     color = vec3(.8, .0, .0);
     // if (fract(p.y) < .02 || fract(1. - p.y) < .02)
-    //     color = vec3(.8);
+    //     color = vec3(.1);
 
 
     const int CHAR_COUNT = 402;
@@ -43,69 +48,70 @@ out vec4 fragColor;
     {
         int c = CHARS[min(i, CHAR_COUNT - 1)];
         if (c == 0)
-            d = fOpUnion(d, dCharA(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharA(pp - vec2(cursor, 0)));
         else if (c == 1)
-            d = fOpUnion(d, dCharB(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharB(pp - vec2(cursor, 0)));
         else if (c == 2)
-            d = fOpUnion(d, dCharC(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharC(pp - vec2(cursor, 0)));
         else if (c == 3)
-            d = fOpUnion(d, dCharD(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharD(pp - vec2(cursor, 0)));
         else if (c == 4)
-            d = fOpUnion(d, dCharE(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharE(pp - vec2(cursor, 0)));
         else if (c == 5)
-            d = fOpUnion(d, dCharF(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharF(pp - vec2(cursor, 0)));
         else if (c == 6)
-            d = fOpUnion(d, dCharG(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharG(pp - vec2(cursor, 0)));
         else if (c == 7)
-            d = fOpUnion(d, dCharH(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharH(pp - vec2(cursor, 0)));
         else if (c == 8)
-            d = fOpUnion(d, dCharI(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharI(pp - vec2(cursor, 0)));
         else if (c == 9)
-            d = fOpUnion(d, dCharJ(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharJ(pp - vec2(cursor, 0)));
         else if (c == 10)
-            d = fOpUnion(d, dCharK(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharK(pp - vec2(cursor, 0)));
         else if (c == 11)
-            d = fOpUnion(d, dCharL(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharL(pp - vec2(cursor, 0)));
         else if (c == 12)
-            d = fOpUnion(d, dCharM(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharM(pp - vec2(cursor, 0)));
         else if (c == 13)
-            d = fOpUnion(d, dCharN(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharN(pp - vec2(cursor, 0)));
         else if (c == 14)
-            d = fOpUnion(d, dCharO(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharO(pp - vec2(cursor, 0)));
         else if (c == 15)
-            d = fOpUnion(d, dCharP(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharP(pp - vec2(cursor, 0)));
         else if (c == 16)
-            d = fOpUnion(d, dCharQ(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharQ(pp - vec2(cursor, 0)));
         else if (c == 17)
-            d = fOpUnion(d, dCharR(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharR(pp - vec2(cursor, 0)));
         else if (c == 18)
-            d = fOpUnion(d, dCharS(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharS(pp - vec2(cursor, 0)));
         else if (c == 19)
-            d = fOpUnion(d, dCharT(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharT(pp - vec2(cursor, 0)));
         else if (c == 20)
-            d = fOpUnion(d, dCharU(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharU(pp - vec2(cursor, 0)));
         else if (c == 21)
-            d = fOpUnion(d, dCharV(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharV(pp - vec2(cursor, 0)));
         else if (c == 22)
-            d = fOpUnion(d, dCharW(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharW(pp - vec2(cursor, 0)));
         else if (c == 23)
-            d = fOpUnion(d, dCharX(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharX(pp - vec2(cursor, 0)));
         else if (c == 24)
-            d = fOpUnion(d, dCharY(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharY(pp - vec2(cursor, 0)));
         else if (c == 25)
-            d = fOpUnion(d, dCharZ(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharZ(pp - vec2(cursor, 0)));
         else if (c == 26)
-            d = fOpUnion(d, dCharExclamation(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharExclamation(pp - vec2(cursor, 0)));
         else if (c == 27)
-            d = fOpUnion(d, dCharColon(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharColon(pp - vec2(cursor, 0)));
         else if (c == 28)
-            d = fOpUnion(d, dCharDash(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharDash(pp - vec2(cursor, 0)));
         else if (c == 29)
-            d = fOpUnion(d, dCharUnderscore(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharUnderscore(pp - vec2(cursor, 0)));
         else if (c == 30)
-            d = fOpUnion(d, dCharSpace(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharSpace(pp - vec2(cursor, 0)));
         else
-            d = fOpUnion(d, dCharBox(pp - vec2(cursor, 0), cursor));
+            d = fOpUnion(d, dCharBox(pp - vec2(cursor, 0)));
+        cursor += FONT_WIDTH;
     }
 
     color += vec3(saturate(1. - (d * 20.)));
