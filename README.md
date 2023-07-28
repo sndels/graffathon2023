@@ -17,7 +17,10 @@ A lightweight framework for fooling around with GLSL-shaders, mainly designed fo
     * `float` uniforms using `r*` Hungarian notation are picked up dynamically
   * Mercury's [hg_sdf](http://mercury.sexy/hg_sdf) included for CSG
 
-I have used [emoon's](https://github.com/emoon/rocket) as my Rocket-server.
+I have used [emoon's](https://github.com/emoon/rocket) as my Rocket-server. There is also a [SDL2 Linux](https://github.com/gustafla/rocket)-fork. The catch is that it's missing menus and can fall over with certain save paths. Only give it filenames instead of full paths and the file will be saved in your run path. Bass install can be avoided e.g. by running at repo root with
+```
+LD_LIBRARY_PATH=[FULL_REPO_PARENT_PATH]/rocket/external/bass/linux ./t2-output/linux-gcc-release-default/editor
+```
 
 ## Build targets
 There are two builds: `skunkwork` holds all the bells and whistles while `skunktoy` drops Rocket and audio integration for more minimalist shader tinkering.
