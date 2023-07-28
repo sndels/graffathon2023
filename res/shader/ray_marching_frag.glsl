@@ -65,6 +65,22 @@ vec3 rayDir(vec2 px)
     return normalize(vec3(uv, 0.7)); // pull ray
 }
 
+vec3 lookAt(vec3 eye, vec3 target, vec3 viewRay) {
+    vec3 up = vec3(0, 1, 0);
+    vec3 fwd = normalize(target - eye);
+    vec3 right = normalize(cross(up, fwd));
+    vec3 newUp = normalize(cross(fwd, right));
+
+    return mat3(
+        right.x, right.y, right.z,
+        newUp.x, newUp.y, newUp.z,
+          fwd.x,   fwd.y,  fwd.z) * viewRay;
+}
+
+uniform vec3 dCamPos;
+uniform vec3 dCamDir;
+uniform vec3 dCamTarget;
+
 void main()
 {
     // Avoid nags if these aren't used
@@ -73,7 +89,13 @@ void main()
 
     // Generate camera ray
     vec3 rd = rayDir(gl_FragCoord.xy);
-    vec3 ro = vec3(0, 0, -3);
+    vec3 ro = vec3(0, 0, -3) - dCamPos;
+    vec3 target = vec3(0, 1, 1);
+
+    // Look at target or raw pitch/yaw angles
+    rd = lookAt(ro, dCamTarget, rd);
+    //   pR(rd.yz, dCamDir.y);
+    //   pR(rd.xz, dCamDir.x);
 
     // Trace them spheres
     vec2 t = march(ro, rd, 0.001, 128, 256);
