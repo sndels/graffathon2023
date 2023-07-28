@@ -10,6 +10,10 @@ out vec4 fragColor;
 
 #define INF (1.0/0.0)
 
+
+vec3 bg(vec3 d) {
+    return mix(vec3(0), vec3(1), d.y);
+}
 // Returns distance to hit and material index
 vec2 scene(vec3 p)
 {
@@ -17,9 +21,10 @@ vec2 scene(vec3 p)
 
     {
         vec3 pp = p;
+        pModMirror2(pp.xy, vec2(.4, .4));
         pR(pp.xz, uTime);
         pR(pp.yz, uTime);
-        float d = fBox(pp, vec3(1));
+        float d = fIcosahedron(pp, 0.1, 30.);
         h = d < h.x ? vec2(d, 0) : h;
     }
 
@@ -44,7 +49,15 @@ vec2 march(vec3 ro, vec3 rd, float prec, float tMax, int iMax)
 
 vec3 shade(vec3 p, vec3 n, vec3 v, float m)
 {
-    return vec3(1);
+    Material mat;
+    mat.albedo = vec3(0.926,0.721,0.504);
+    mat.metallic = 1;
+    mat.roughness = 0.1;
+
+    vec3 l = normalize(vec3(1, 1, -1));
+    vec3 ret =  evalBRDF(n, v, l, mat) * vec3(3);
+    ret += bg(-reflect(-v, n)) * 0.1;
+    return ret;
 }
 
 vec3 normal(vec3 p)
@@ -100,7 +113,7 @@ void main()
     // Trace them spheres
     vec2 t = march(ro, rd, 0.001, 128, 256);
     if (t.x > 128) {
-        fragColor = vec4(0);
+        fragColor = vec4(bg(rd), 1);
         return;
     }
 
@@ -114,5 +127,5 @@ void main()
     vec3 color = shade(p, n, v, m);
 
     // Color the pixel
-    fragColor = vec4(pow(color, vec3(1/2.2)), 1);
+    fragColor = vec4(tonemap(color), 1);
 }
