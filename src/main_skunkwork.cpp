@@ -66,8 +66,8 @@ int main(int argc, char *argv[])
 
     // Set up audio
     std::string musicPath(RES_DIRECTORY);
-    musicPath += "illegal_af.wav";
-    if (!AudioStream::getInstance().init(musicPath, 175.0, 8))
+    musicPath += "gthon_saund.wav";
+    if (!AudioStream::getInstance().init(musicPath, 128.0, 8))
     {
         gui.destroy();
         window.destroy();
