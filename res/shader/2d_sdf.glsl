@@ -61,7 +61,7 @@ float dHalfCircle(vec2 p, float r)
     return d;
 }
 
-#define FONT_WIDTH 2.5
+#define FONT_WIDTH 3.
 #define FONT_DESCENDERS -2.5
 
 float dCharA(vec2 p)
@@ -148,12 +148,12 @@ float dCharH(vec2 p)
 
 float dCharI(vec2 p)
 {
-    float d = dRect(p - vec2(.0, .6), vec2(.2, 1.3));
-    d = fOpDifference(d, dRect(p - vec2(.0, 1.15), vec2(.5, .45)));
-    d = fOpUnion(d, dHalfCircle(p - vec2(-.2, .6), .4));
-    vec2 pp = p;
+    float d = dRect(p - vec2(.1, .6), vec2(.2, 1.3));
+    d = fOpDifference(d, dRect(p - vec2(.1, 1.15), vec2(.5, .45)));
+    d = fOpUnion(d, dHalfCircle(p - vec2(-.1, .6), .4));
+    vec2 pp = p - vec2(.3, -.6);
     pR(pp, PI);
-    d = fOpUnion(d, dHalfCircle(pp - vec2(-.2, .6), .4));
+    d = fOpUnion(d, dHalfCircle(pp, .4));
     return d;
 }
 
@@ -240,13 +240,13 @@ float dCharQ(vec2 p)
 
 float dCharR(vec2 p)
 {
-    float d = dCircle(p - vec2(.0, .0), 1.);
-    d = fOpDifference(d, dCircle(p - vec2(.0, .0), .6));
-    d = fOpDifference(d, dRect(p - vec2(.25, -.65), vec2(.9, .75)));
-    vec2 pp = p - vec2(.85 , .3);
+    float d = dCircle(p - vec2(.2, .0), 1.);
+    d = fOpDifference(d, dCircle(p - vec2(.2, .0), .6));
+    d = fOpDifference(d, dRect(p - vec2(.45, -.65), vec2(.9, .75)));
+    vec2 pp = p - vec2(1.05 , .3);
     pR(pp, -PI / 7);
     d = fOpDifference(d, dRect(pp, vec2(.65, .4)));
-    d = fOpUnion(d, dRect(p - vec2(-.8 , .0), vec2(.2, 1.)));
+    d = fOpUnion(d, dRect(p - vec2(-.6 , .0), vec2(.2, 1.)));
     return d;
 }
 
