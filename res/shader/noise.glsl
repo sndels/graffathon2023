@@ -35,3 +35,43 @@ float fbm(vec3 p, float omega, int octaves) {
     }
     return sum;
 }
+
+// From Hash Functions for GPU Rendering
+// By Jarzynski & Olano
+// https://jcgt.org/published/0009/03/02/supplementary.pdf
+uvec3 pcg3d(uvec3 v)
+{
+    v = v * 1664525u + 1013904223u;
+    v.x += v.y * v.z;
+    v.y += v.z * v.x;
+    v.z += v.x * v.y;
+    v ^= v >> 16u;
+    v.x += v.y * v.z;
+    v.y += v.z * v.x;
+    v.z += v.x * v.y;
+    return v;
+}
+
+float rngTo01(uint u) { return u / float(0xFFFFFFFFu); }
+
+vec2 rngTo01(vec2 u) { return u / float(0xFFFFFFFFu); }
+
+vec3 rngTo01(vec3 u) { return u / float(0xFFFFFFFFu); }
+
+// Should be initialized at the shader entrypoint e.g. as uvec3(px, frameIndex)
+uvec3 pcg_state;
+float rnd01()
+{
+    pcg_state = pcg3d(pcg_state);
+    return rngTo01(pcg_state.x);
+}
+vec2 rnd2d01()
+{
+    pcg_state = pcg3d(pcg_state);
+    return rngTo01(pcg_state.xy);
+}
+vec3 rnd3d01()
+{
+    pcg_state = pcg3d(pcg_state);
+    return rngTo01(pcg_state.xyz);
+}
