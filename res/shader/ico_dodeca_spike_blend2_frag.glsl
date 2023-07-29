@@ -23,18 +23,24 @@ vec2 scene(vec3 p)
 {
     vec2 h = vec2(INF);
 
-    { // Scaly thing
-        pR(p.xz, uTime * .5);
-        pR(p.yz, uTime * .8);
+    {
         vec3 pp = p;
+        pR(pp.xy, PI / 4);
+        pR(pp.yz, .1);
+        pR(pp.xz, uTime * .2);
+
         pR(pp.xz, .3);
-        float d = fIcosahedron(pp, 4., 30.);
+        pModMirror1(p.x, 2.);
+        float d = fIcosahedron(pp, 4.);
+        d = mix(d, fDodecahedron(pp, 3.), cos(uTime));
 
         pp = p;
-        pMod1(pp.y, sin(uTime * 8));
-        pp -= vec3(.0, .4, .0);
-        d = fOpDifferenceChamfer(d, fBox(pp, vec3(100., .4, 100.)), .1);
-
+        pR(pp.xy, PI / 4);
+        pR(pp.yz, .1);
+        pR(pp.xz, uTime * .2);
+        pp -= vec3(.0, fract(uTime) * 2, .0);
+        pMod1(pp.y, 2.);
+        d = fOpDifferenceChamfer(d, fBox(pp, vec3(100., abs(sin(uTime)) * .4, 100.)), .1);
         d -= .1;
 
         h = d < h.x ? vec2(d, 1) : h;
