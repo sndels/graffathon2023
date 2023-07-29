@@ -54,8 +54,7 @@ vec2 scene(vec3 p)
         pp = p;
         pp -= vec3(.0, fract(uTime) * 2, .0);
         pMod1(pp.y, 2.);
-
-
+        d = fOpDifferenceChamfer(d, fBox(pp, vec3(100., .4, 100.)), .1);
         d -= .1;
 
         h = d < h.x ? vec2(d, 1) : h;
