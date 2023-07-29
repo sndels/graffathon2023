@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
                                    GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER};
     TextureParams rgba32fParams = {GL_RGBA32F, GL_RGBA, GL_FLOAT,
                                    GL_LINEAR, GL_LINEAR,
-                                   GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER};
+                                   GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE};
 
 
     // Generate framebuffer for main rendering
