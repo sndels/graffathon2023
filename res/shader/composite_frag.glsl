@@ -6,6 +6,7 @@
 uniform vec3 dColor;
 uniform float dMix;
 uniform float dPrev;
+uniform float dFlowFeedback;
 uniform float uMultiplier;
 
 uniform sampler2D uScenePingColorDepth;
@@ -22,6 +23,7 @@ layout(location = 3) out vec4 flow;
 layout(location = 4) out vec4 colorFeedback;
 
 #define ABERR_SAMPLES 16
+#define PI 3.1415926535
 
 uniform float dCaberr = .0;
 vec4 sampleSource(sampler2D s, float aberr)
@@ -66,15 +68,18 @@ float vectorWeight(vec2 v1, vec2 v2)
 // sampler: sampler to use
 vec2 resampleFlowPing(vec2 f, vec3 t, int nSamples)
 {
-    float sampleDistance = length(f)+4.0*min(pixelSize.x, pixelSize.y);//50.0*min(pixelSize.x, pixelSize.y);
+    float sampleDistance = 0.1f;
     float weightSum = 0.0;
     vec2 ff = vec2(0.0, 0.0);
     for (int i=0; i<nSamples; ++i) {
-        vec2 fs = f + sampleDistance*2.0*(rnd2d01()-0.5);
-        vec3 sRgb = texture(uPrevPing, texCoord+fs).rgb;
-        vec2 sFlow = texture(uFlow, texCoord+fs).xy;
+        vec2 samplePos = texCoord+sampleDistance*2.0*(rnd2d01()-0.5);
+        samplePos = clamp(samplePos, 0.0, 1.0);
+        vec3 sRgb = texture(uPrevPing, samplePos).rgb;
+        vec2 sFlow = texture(uFlow, samplePos).xy;
+        vec2 fs = samplePos-texCoord;
 
-        float weight = (/*vectorWeight(f, sFlow)+*/1.0) / (length(t-sRgb) + 0.00001);
+        float weight = (vectorWeight(fs, sFlow)*exp(-4.0*pow(length(fs)/sampleDistance, 2.0))) /
+            (length(t-sRgb) + 0.0001);
         weightSum += weight;
         ff += fs*weight;
     }
@@ -87,15 +92,18 @@ vec2 resampleFlowPing(vec2 f, vec3 t, int nSamples)
 // sampler: sampler to use
 vec2 resampleFlowPong(vec2 f, vec3 t, int nSamples)
 {
-    float sampleDistance = length(f)+4.0*min(pixelSize.x, pixelSize.y);//50.0*min(pixelSize.x, pixelSize.y);
+    float sampleDistance = 0.1f;
     float weightSum = 0.0;
     vec2 ff = vec2(0.0, 0.0);
     for (int i=0; i<nSamples; ++i) {
-        vec2 fs = f + sampleDistance*2.0*(rnd2d01()-0.5);
-        vec3 sRgb = texture(uPrevPong, texCoord+fs).rgb;
-        vec2 sFlow = texture(uFlow, texCoord+fs).wz;
+        vec2 samplePos = texCoord+sampleDistance*2.0*(rnd2d01()-0.5);
+        samplePos = clamp(samplePos, 0.0, 1.0);
+        vec3 sRgb = texture(uPrevPong, samplePos).rgb;
+        vec2 sFlow = texture(uFlow, samplePos).wz;
+        vec2 fs = samplePos-texCoord;
 
-        float weight = (/*vectorWeight(f, sFlow)+*/1.0) / (length(t-sRgb) + 0.001);
+        float weight = (vectorWeight(fs, sFlow)*exp(-4.0*pow(length(fs)/sampleDistance, 2.0))) /
+            (length(t-sRgb) + 0.0001);
         weightSum += weight;
         ff += fs*weight;
     }
@@ -120,7 +128,7 @@ void main()
     }
 
     // init noise
-    pcg_state = uvec3(gl_FragCoord.xy, uTime*120);
+    pcg_state = uvec3(gl_FragCoord.xy+uvec2(10, 0), uTime*120);
 
     vec4 ping = texture(uScenePingColorDepth, texCoord);
     vec4 pong = texture(uScenePongColorDepth, texCoord);
@@ -133,35 +141,31 @@ void main()
         0.15*texture(uFlow, texCoord+vec2(0.0, -pixelSize.y));
 
     // mix factors
-    float mixPing = pow(clamp(1.0-dMix*2.0, 0.0, 1.0), 4.0);
-    float mixPong = pow(clamp(dMix*2.0-1.0, 0.0, 1.0), 4.0);
+    float mixPing = pow(clamp(1.0-dMix*1.8, 0.0, 1.0), 3.0);
+    float mixPong = pow(clamp(dMix*1.8-0.8, 0.0, 1.0), 3.0);
     float mixFeedback = 1.0-mixPing-mixPong;
-    float mixFlow = clamp(dMix*2.0-0.5, 0.0, 1.0);
+    float mixFlow = clamp(dMix*1.5-0.25, 0.0, 1.0);
 
     // sample
     float flowDamping = 0.99;
-    flow.xy = resampleFlowPing(flowPrev.xy, ping.rgb, 100)*flowDamping;
-    flow.zw = resampleFlowPong(flowPrev.zw, pong.rgb, 100)*flowDamping;
-//    flow.zw = resampleFlowPong(flowPrev.zw, pongPrev.rgb, uScenePongColorDepth, 20);
+    flow.xy = ((1.0-dFlowFeedback)*resampleFlowPing(flowPrev.xy, ping.rgb, 20) +
+        dFlowFeedback*flowPrev.xy)*flowDamping;
+    flow.zw = ((1.0-dFlowFeedback)*resampleFlowPong(flowPrev.zw, pong.rgb, 20) +
+        dFlowFeedback*flowPrev.zw)*flowDamping;
 
     vec2 f = mix(flow.xy, flow.zw, mixFlow);
 
     vec3 color = vec3(0);
-//    color.rgb = mix(ping.rgb, pong.rgb, dMix);
-//    vec3 prev = mix(texture(uPrevPing, texCoord).rgb, texture(uPrevPong, texCoord).rgb, dMix);
-//    color.rgb = prev.rgb;
-//    color.rgb -= dPrev*prev;
-    //color.rgb = 0.33*color.rgb + 0.33*texture(uPrevPing, texCoord).rgb + 0.33*texture(uPrevPong, texCoord).rgb;
 
     prevPing = ping;
     prevPong = pong;
     //flow.xy = vec2(0.0, 0.0);//mix(f, flowPrev.xy, 0.95)*0.999;
     color.rgb = texture(uColorFeedback, texCoord).rgb;
-    colorFeedback = mixPing*ping + mixPong*pong + mixFeedback*texture(uColorFeedback, texCoord-f);
+    colorFeedback = mixPing*ping + mixPong*pong + mixFeedback*texture(uColorFeedback, texCoord+f*rnd01());
 
     fragColor = vec4(color, 1);
-//    fragColor = vec4(f.xy*1.0f+0.5, 0.5, 1);
-//    fragColor = vec4(flow.zw*1.0f+0.5, 0.5, 1);
+//    fragColor = fragColor*0.2 + 0.8*vec4(flow.xy*100.0f+0.5, 0.5, 1);
+//    fragColor = vec4(f*100.0f+0.5, 0.5, 1);
     //fragColor = 0.05*vec4(color, 1) + 0.95*texture(uPrevAux, texCoord);
 
 
