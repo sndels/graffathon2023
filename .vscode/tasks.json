@@ -74,6 +74,7 @@
                 "build",
                 "-G",
                 "Ninja",
+                "-DCMAKE_BUILD_TYPE=Release",
                 "-DDISTRIBUTE_DEMO=1"
             ],
             "presentation": {
@@ -142,6 +143,7 @@
             ],
             "command": "msbuild",
             "args": [
+                "/property:Configuration=Release",
                 "INSTALL.vcxproj"
             ],
             "group": "build",
