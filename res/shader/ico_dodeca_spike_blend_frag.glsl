@@ -15,7 +15,7 @@ uniform vec3 dPos;
 uniform vec3 dRot;
 
 vec3 bg(vec3 d) {
-    return mix(vec3(.553, .903, .078) * .2, vec3(.879, .061, .995), d.y * 0.5 + 0.5);
+    return mix(vec3(0) * .2, vec3(.879, .061, .995), d.y * 0.5 + 0.5);
 }
 
 // Returns distance to hit and material index
@@ -41,20 +41,23 @@ vec2 scene(vec3 p)
     // }
 
     {
-        // pR(p.yz, uTime);
-        // pR(p.xz, PI / 2);
-        pR(p.xy, PI / 4);
-        pR(p.yz, .1);
-        pR(p.xz, uTime * .2);
         vec3 pp = p;
+        pR(pp.xy, PI / 4);
+        pR(pp.yz, .1);
+        pR(pp.xz, uTime * .2);
+
         pR(pp.xz, .3);
+        pModMirror1(p.x, 2.);
         float d = fIcosahedron(pp, 4.);
         d = mix(d, fDodecahedron(pp, 3.), cos(uTime));
 
         pp = p;
+        pR(pp.xy, PI / 4);
+        pR(pp.yz, .1);
+        pR(pp.xz, uTime * .2);
         pp -= vec3(.0, fract(uTime) * 2, .0);
         pMod1(pp.y, 2.);
-        d = fOpDifferenceChamfer(d, fBox(pp, vec3(100., .4, 100.)), .1);
+        d = fOpDifferenceChamfer(d, fBox(pp, vec3(100., abs(sin(uTime)) * .4, 100.)), .1);
         d -= .1;
 
         h = d < h.x ? vec2(d, 1) : h;
@@ -195,7 +198,7 @@ void main()
     rd = normalize(rd);
 
     // Trace them spheres
-    float tMax = 128;
+    float tMax = 1024;
     vec2 t = marchEnhanced(ro, rd, pixelRadius, tMax, 256);
     // vec2 t = march(ro, rd, 0.001, tMax, 256);
     if (t.x > tMax) {
