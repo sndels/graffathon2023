@@ -13,7 +13,9 @@ out vec4 fragColor;
 
 vec3 bg(vec3 d) {
     vec2 uv = gl_FragCoord.xy*2.0 / uRes.xy - 1.0;
-
+    float ar = float(uRes.x) / uRes.y;
+    uv *= 100;
+    uv.x *= ar;
     // Time varying pixel color
     float x_temp;
     float x =  0.0;
@@ -25,10 +27,10 @@ vec3 bg(vec3 d) {
         cos(uTime), -sin(uTime),
         sin(uTime), cos(uTime)
     );
-    float zoomFactor = pow(2.0, -3.0+3.0*sin(uTime * 0.5));
+    float zoomFactor = .018 * pow(2.0, (-10.0+10.0*sin(uTime * 0.5)));
     mat2 zoom = mat2(
-        zoomFactor* 2.5, 0,
-        0, 2.5 * zoomFactor
+        zoomFactor, 0,
+        0, zoomFactor
     );
     
     vec2 translation = vec2(0.33334,0.4201);
@@ -60,9 +62,19 @@ vec3 bg(vec3 d) {
     //vec3 col = vec3(x,y,0.0);
     vec3 col = vec3(i_float*0.01,i_float*0.01,0);
     col.x = pow(col.x, 0.5+0.5*cos(uTime));
-    float parina = 10.0*pow(col.y, 0.05+0.05*sin(uTime));
+    float parina = 10.0*pow(col.y, 0.05+0.05*abs(sin(uTime)));
     col.y = abs(0.5 - 0.5*cos(parina))+0.00001;
     col.z = abs(0.5 - 0.1*cos(parina))+0.00001;
+
+    if (isnan(col.x) || isinf(col.x)){
+        col.x = 0;
+    }
+    if (isnan(col.y) || isinf(col.y)){  //HUUTISTA KERTAALLEEN :DDD
+        col.y = 0;
+    }
+    if (isnan(col.z) || isinf(col.z)){
+        col.z = 0;
+    }
 
     return mix(vec3(col.x*0.3,0,0), vec3(0,col.y*0.5,0), 0.5);
 }
@@ -101,8 +113,10 @@ vec2 march(vec3 ro, vec3 rd, float prec, float tMax, int iMax)
 
 vec3 shade(vec3 p, vec3 n, vec3 v, float m)
 {
-        vec2 uv = gl_FragCoord.xy*2.0 / uRes.xy - 1.0;
-
+    vec2 uv = gl_FragCoord.xy*2.0 / uRes.xy - 1.0;
+    float ar = float(uRes.x) / uRes.y;
+    uv *= 100;
+    uv.x *= ar;
     // Time varying pixel color
     float x_temp;
     float x =  0.0;
@@ -114,10 +128,10 @@ vec3 shade(vec3 p, vec3 n, vec3 v, float m)
         cos(uTime), sin(uTime),
         -sin(uTime), cos(uTime)
     );
-    float zoomFactor = pow(2.0, sin(uTime * 0.5));
+    float zoomFactor = .1 * abs(pow(2.0, sin(uTime * 0.5)));
     mat2 zoom = mat2(
-        zoomFactor* 2.5, 0,
-        0, 2.5 * zoomFactor
+        zoomFactor, 0,
+        0, zoomFactor
     );
     
     vec2 translation = vec2(0.33334,0.4201);
@@ -149,9 +163,19 @@ vec3 shade(vec3 p, vec3 n, vec3 v, float m)
     //vec3 col = vec3(x,y,0.0);
     vec3 col = vec3(i_float*0.01,i_float*0.01,0);
     col.x = 0.2;
-    float parina = 1000.0*pow(col.y, 0.05+0.05*sin(uTime));
+    float parina = 1000.0*pow(col.y, 0.05+0.05*abs(sin(uTime)));
     col.y = 0;
     col.z = abs(0.5 - 0.5*cos(parina))+0.00001;
+
+    if (isnan(col.x) || isinf(col.x)){
+        col.x = 0;
+    }
+    if (isnan(col.y) || isinf(col.y)){  //HUUTISTA :DDD
+        col.y = 0;
+    }
+    if (isnan(col.z) || isinf(col.z)){
+        col.z = 0;
+    }
 
     Material mat;
     mat.albedo = vec3(0.2342,0.8685,.98981);
