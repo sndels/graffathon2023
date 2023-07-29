@@ -128,7 +128,7 @@ vec3 shade(vec3 p, vec3 n, vec3 v, float m)
         cos(uTime), sin(uTime),
         -sin(uTime), cos(uTime)
     );
-    float zoomFactor = .1 * abs(pow(2.0, sin(uTime * 0.5)));
+    float zoomFactor = .09 * pow(2.0, (-10.0+10.0*sin(uTime * 0.5)));
     mat2 zoom = mat2(
         zoomFactor, 0,
         0, zoomFactor
