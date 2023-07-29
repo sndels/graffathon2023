@@ -90,6 +90,8 @@ int main(int argc, char *argv[])
     sceneShaders.emplace_back("Basic", rocket, vertPath, RES_DIRECTORY "shader/basic_frag.glsl");
     sceneShaders.emplace_back("RayMarch", rocket, vertPath, RES_DIRECTORY "shader/ray_marching_frag.glsl");
     sceneShaders.emplace_back("Text", rocket, vertPath, RES_DIRECTORY "shader/text_frag.glsl");
+    sceneShaders.emplace_back("2DishSpaceTwister", rocket, vertPath, RES_DIRECTORY "shader/2dish_space_twister_frag.glsl");
+    sceneShaders.emplace_back("IcoDodecaSpikeBlend", rocket, vertPath, RES_DIRECTORY "shader/ico_dodeca_spike_blend_frag.glsl");
     Shader compositeShader("Composite", rocket, vertPath, RES_DIRECTORY "shader/composite_frag.glsl");
     Shader quadShader("Quad", rocket, vertPath, RES_DIRECTORY "shader/render_quad_frag.glsl");
 
@@ -132,7 +134,7 @@ int main(int argc, char *argv[])
 
     FrameBuffer scenePingFbo(XRES, YRES, sceneTexParams);
     FrameBuffer scenePongFbo(XRES, YRES, sceneTexParams);
-    FrameBuffer compositeFbo(XRES, YRES, {rgba16fParams, rgba32fParams});
+    FrameBuffer compositeFbo(XRES, YRES, {rgba16fParams, rgba32fParams, rgba32fParams, rgba32fParams, rgba32fParams});
 
     AudioStream::getInstance().play();
 
@@ -255,7 +257,10 @@ int main(int argc, char *argv[])
             compositeShader.setVec2("uRes", (GLfloat)window.width(), (GLfloat)window.height());
             scenePingFbo.bindRead(0, GL_TEXTURE0, compositeShader.getUniformLocation("uScenePingColorDepth"));
             scenePongFbo.bindRead(0, GL_TEXTURE1, compositeShader.getUniformLocation("uScenePongColorDepth"));
-            compositeFbo.bindRead(1, GL_TEXTURE2, compositeShader.getUniformLocation("uPrevAux"));
+            compositeFbo.bindRead(1, GL_TEXTURE2, compositeShader.getUniformLocation("uPrevPing"));
+            compositeFbo.bindRead(2, GL_TEXTURE3, compositeShader.getUniformLocation("uPrevPong"));
+            compositeFbo.bindRead(3, GL_TEXTURE4, compositeShader.getUniformLocation("uFlow"));
+            compositeFbo.bindRead(4, GL_TEXTURE5, compositeShader.getUniformLocation("uColorFeedback"));
             q.render();
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
             compositeProf.endSample();
@@ -267,7 +272,7 @@ int main(int argc, char *argv[])
                 gui.useSliderTime() ? gui.sliderTime() : globalTime.getSeconds()
             );
             quadShader.setVec2("uRes", (GLfloat)window.width(), (GLfloat)window.height());
-            compositeFbo.bindRead(0, GL_TEXTURE2, quadShader.getUniformLocation("uQuad"));
+            compositeFbo.bindRead(0, GL_TEXTURE6, quadShader.getUniformLocation("uQuad"));
             q.render();
             quadProf.endSample();
         }
