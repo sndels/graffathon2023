@@ -292,8 +292,10 @@ int main(int argc, char *argv[])
 #endif // DEMO_MODE
     }
 
+#ifdef TCPROCKET
     // Save rocket tracks
     sync_save_tracks(rocket);
+#endif // TCPROCKET
 
     // Release resources
     sync_destroy_device(rocket);
