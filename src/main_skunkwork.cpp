@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
     std::vector<Shader> sceneShaders;
     sceneShaders.emplace_back("Basic", rocket, vertPath, RES_DIRECTORY "shader/basic_frag.glsl");
     sceneShaders.emplace_back("RayMarch", rocket, vertPath, RES_DIRECTORY "shader/ray_marching_frag.glsl");
+    sceneShaders.emplace_back("Pedestal", rocket, vertPath, RES_DIRECTORY "shader/pedestal.glsl");
     sceneShaders.emplace_back("Ayy", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching.glsl");
     sceneShaders.emplace_back("Ayy2", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching2.glsl");
     sceneShaders.emplace_back("Ayy3", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching3.glsl");
