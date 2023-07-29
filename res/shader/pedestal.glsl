@@ -13,14 +13,14 @@ out vec4 fragColor;
 #define NUM_SPHERES 32
 
 uniform vec4 sphere_coords[NUM_SPHERES];
-uniform vec3 dAlbedo = vec3(0.9, 0.36, 0.);
+uniform vec3 dAlbedo = vec3(0.8, 0.36, 0.);
 uniform float dMetallic;
 uniform float dRoughness;
 
 
 vec3 bg(vec3 d) {
-    float v = fbm(d * 10 + vec3(uTime, 0, 0), 2, 3);
-    return mix(vec3(0), vec3(0.7) * v, -d.y);
+    float v = fbm(d * 10 + vec3(uTime, 0, 0), 2, 4);
+    return mix(vec3(0), vec3(0.2) * v, -d.y);
 }
 
 vec3 xform(vec3 p)
@@ -30,6 +30,9 @@ vec3 xform(vec3 p)
     p.z -= uTime * -6.0 - v + 1.0;
         //pR(p.xz, uTime);
     pModMirror2(p.xz, vec2(5));
+
+    //p.x += sin(p.x * 10) ;
+
     return p;
 }
 
@@ -40,13 +43,21 @@ vec2 scene(vec3 p)
 
     p = xform(p);
 
+
     //p.x = mod(p.x, 2);
     {
         vec3 pp = p;
         //pModMirror2(pp.xy, vec2(.4, .4));
         //pR(pp.yz, uTime);
         //float d = fIcosahedron(pp, 0.4, 30.);
-        float d = fBox(pp - vec3(0, -0.2, 0), vec3(1.0, 0.2, 1.0));
+        float d = fBox(pp - vec3(0, -0.4, 0), vec3(1.2, 0.4, 1.2));
+        float dd = fBox(pp - vec3(0, -0.7, 0), vec3(1.4, 0.2, 1.4));
+
+        float ddd = fBox(pp - vec3(0, -0.2, 0), vec3(1.0, 0.2, 1.0));
+        //d = fOpUnionRound(d, dd, 0.2);
+        d = fOpDifferenceColumns(d, ddd, 0.1, 2);
+
+        d = fOpUnionRound(d, dd, 0.2);
         d += fbm(pp * 5, 2, 3) * 0.01;
         //d += fbm(pp * 8, 0.2, 12) * 0.1;
 
@@ -64,7 +75,7 @@ vec2 scene(vec3 p)
         pR(pp.xz, uTime);
         //pR(pp.yz, uTime);
         //float d = fIcosahedron(pp, 0.4, 30.);
-        //float d = fBox(pp, vec3(1.0, 0.1, 1.0));
+        //float d = fBox(pp, vec3(1.4, 0.1, 1.4));
         //d = fOpUnion(d, fSphere(pp, 1.0), 0.1);
 
 #if 1
@@ -72,14 +83,14 @@ vec2 scene(vec3 p)
         for (int i = 0; i < NUM_SPHERES; ++i) {
             vec3 m = vec3(0);
             vec3 ppp = pp;
-            ppp.y -= cos(i / 2.0 + uTime) * 2 + 2.0;
-            ppp.x -= sin(i + uTime) * 0.6 ;
+            ppp.y -= -abs(sin((i + 0.3) / 2.0 + uTime * 0.3)) * 4 + 3.5;
+            ppp.x -= sin(i * 3 + uTime) * 0.6 ;
             ppp.z -= sin(i * 10 + uTime) * 0.6 ;
             /*
             ppp.x -= fbm(vec3(uTime, float(i), 0), 1, 4) * 0.6 - 1;
             ppp.z -= fbm(vec3(0, float(i), uTime), 1, 4) * 0.6 - 1;
             */
-            //d = fOpUnionSoft(d, fSphere(ppp, 0.25), 0.4);
+            //d = fOpUnionSoft(d, fSphere(ppp, 0.35), 0.3);
             d = fOpUnionSoft(d, fDodecahedron(ppp, 0.25), 0.4);
             //pp.x += 0.2;
             //d = min(d, fSphere(ppp, 1.0));
