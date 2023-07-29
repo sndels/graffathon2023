@@ -174,9 +174,9 @@ void main()
     float pixelRadius = distance(rd, rayDir(gl_FragCoord.xy + 1)) / 4;
 
     // Look at target or raw pitch/yaw angles
-    rd = lookAt(ro, dCamTarget, rd);
+    // rd = lookAt(ro, dCamTarget, rd);
     //   pR(rd.yz, dCamDir.y);
-    //   pR(rd.xz, dCamDir.x);
+    pR(rd.xy, uTime * .5);
     rd = normalize(rd);
 
     // Trace them spheres
