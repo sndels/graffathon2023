@@ -10,12 +10,8 @@ out vec4 fragColor;
 
 #define INF (1.0/0.0)
 
-uniform vec3 dColor = vec3(0.951, 0.727, 0.099);
-uniform vec3 dPos;
-uniform vec3 dRot;
-
 vec3 bg(vec3 d) {
-    return vec3(.09, .1, .06);
+    return vec3(0.313, .0, .4);
 }
 
 // Returns distance to hit and material index
@@ -110,9 +106,22 @@ vec2 marchEnhanced(vec3 ro, vec3 rd, float pixelRadius, float tMax, int iMax) {
 
 vec3 shade(vec3 p, vec3 n, vec3 v, float m)
 {
-    if (m == 0.)
-        return vec3(.3, .061, .5);
-    return vec3(.77, .9, .022);
+    Material mat;
+    mat.albedo = vec3(0.926,0.721,0.504);
+    mat.metallic = 1;
+    mat.roughness = 0.2;
+
+    vec3 l = normalize(vec3(1., -.8, -1.));
+    vec3 I = 3. * vec3(.553, .903, .078);
+    vec3 ret = evalBRDF(n, v, l, mat) * I;
+
+    l = normalize(vec3(-1., .8, -1));
+    I = 3. * vec3(.879, .061, .995);
+    ret += evalBRDF(n, v, l, mat) * I;
+
+    vec3 lBg = reflect(-v, n);
+    ret += bg(lBg) * 0.1;
+    return ret;
 }
 
 vec3 normal(vec3 p)
