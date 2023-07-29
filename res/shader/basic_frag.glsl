@@ -18,11 +18,10 @@ struct Point {
   float max_y_offset;
   vec3 point_color;
 };
-//uRes.x / 2.0;
 
 Point init_point(float pos_init)
 {
-  struct Point point;
+  Point point;
   point.pos = vec2(pos_init);
   point.offset_x = point.pos.x;
   point.offset_y = point.pos.y;
@@ -37,17 +36,17 @@ Point init_point(float pos_init)
         0.5
     );
   return point;
-};
+}
 
-Point update_point(struct Point point, float k)
+Point update_point(Point point, float k)
 {
   point.pos = vec2(point.pos.x + k*10*point.v_y*(cos(uTime)) + 0.5*point.v_x*(sin(uTime)),
                    point.pos.y + k*10*point.v_y*(cos(uTime/5)))+ 0.5*point.v_x*(sin(uTime));
   return point;
 }
 
-struct Point point1 = init_point(0.0);
-struct Point point2 = init_point(10.0);
+Point point1 = init_point(0.0);
+Point point2 = init_point(10.0);
 float prev_time = uTime;
 
 void main()
@@ -55,6 +54,7 @@ void main()
     // Avoid nags if these aren't used
     if (uTime < -1 || uRes.x < -1)
         discard;
+
     pcg_state = uvec3(gl_FragCoord.xy, uTime*100);
     vec2 uv = gl_FragCoord.xy*2.0 / uRes.xy - 1.0;
     float ar = float(uRes.x) / uRes.y;
@@ -101,7 +101,7 @@ void main()
         0.5+0.5*sin(length(uv + rOff)*3.4 + 10.0*cos(uTime * 1.0)),
         0.5+0.5*sin(length(uv + gOff)*2.9 + 10.0*cos(uTime * 1.2)),
         0.5+0.5*sin(length(uv + bOff)*1.3 + 10.0*cos(uTime * 0.9))
-    ); 
+    );
 */
     fragColor = vec4(color, 1);
 }
