@@ -299,11 +299,15 @@ GLuint Shader::loadProgram(const std::string& vertPath, const std::string& fragP
 
         // Init new uniform
         UniformType type = u.second.first;
+        float default_data[3];
+        glGetUniformfv(progID, u.second.second, default_data);
         switch (type) {
         case UniformType::Float:
         case UniformType::Vec2:
         case UniformType::Vec3:
-            newDynamics.insert({u.first, {type, {0.f, 0.f, 0.f}}});
+            newDynamics.insert({u.first, {type, {default_data[0],
+                                                 default_data[1],
+                                                 default_data[2]}}});
             break;
         default:
             printf("[shader] Unimplemented dynamic uniform of type '%s'\n", toString(type).c_str());
