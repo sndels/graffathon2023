@@ -12,7 +12,59 @@ out vec4 fragColor;
 
 
 vec3 bg(vec3 d) {
-    return mix(vec3(0), vec3(1), d.y);
+    vec2 uv = gl_FragCoord.xy*2.0 / uRes.xy - 1.0;
+
+    // Time varying pixel color
+    float x_temp;
+    float x =  0.0;
+    float y = 0.0;
+    int max_iter = 8000;
+    int i = 0;
+    
+    mat2 rot = mat2(
+        cos(uTime), -sin(uTime),
+        sin(uTime), cos(uTime)
+    );
+    float zoomFactor = pow(2.0, -3.0+3.0*sin(uTime * 0.5));
+    mat2 zoom = mat2(
+        zoomFactor* 2.5, 0,
+        0, 2.5 * zoomFactor
+    );
+    
+    vec2 translation = vec2(0.33334,0.4201);
+    
+    uv = uv * rot * zoom + translation;
+    
+    for(i = 0;x*x + y*y <= 2.0*2.0 && i<max_iter;i++)
+    {
+        x_temp = x*x - y*y + uv.x;
+        y = 2.0*x*y + uv.y;
+        x = x_temp;
+    }
+    
+    float log_zn;
+    float nu;
+    float i_float = float(i);
+    if (i == max_iter) {
+        i = 0;
+        i_float = 0.0;
+    }
+    else if (i < max_iter) {
+        log_zn = log(x*x + y*y) / 2.0;
+        nu = log((log_zn / log(2.0))) / log(2.0);
+        i_float = i_float - nu;
+    }
+
+    
+
+    //vec3 col = vec3(x,y,0.0);
+    vec3 col = vec3(i_float*0.01,i_float*0.01,0);
+    col.x = pow(col.x, 0.5+0.5*cos(uTime));
+    float parina = 10.0*pow(col.y, 0.05+0.05*sin(uTime));
+    col.y = abs(0.5 - 0.5*cos(parina))+0.00001;
+    col.z = abs(0.5 - 0.1*cos(parina))+0.00001;
+
+    return mix(vec3(col.x*0.3,0,0), vec3(0,col.y*0.5,0), 0.5);
 }
 // Returns distance to hit and material index
 vec2 scene(vec3 p)
@@ -21,11 +73,11 @@ vec2 scene(vec3 p)
 
     {
         vec3 pp = p;
-        pModMirror2(pp.xy, vec2(.4, .4));
+        pModMirror2(pp.xy, vec2(3, 3));
         pR(pp.xz, uTime);
         pR(pp.yz, uTime);
-        float d = fIcosahedron(pp, 0.1, 30.);
-        h = d < h.x ? vec2(d, 0) : h;
+        float d = fIcosahedron(pp, .6+abs(sin(uTime)*0.3), 30.+abs(cos(uTime*5)*1.));
+        h = d < h.x ? vec2(d, 1) : h;
     }
 
     return h;
@@ -49,14 +101,66 @@ vec2 march(vec3 ro, vec3 rd, float prec, float tMax, int iMax)
 
 vec3 shade(vec3 p, vec3 n, vec3 v, float m)
 {
+        vec2 uv = gl_FragCoord.xy*2.0 / uRes.xy - 1.0;
+
+    // Time varying pixel color
+    float x_temp;
+    float x =  0.0;
+    float y = 0.0;
+    int max_iter = 8000;
+    int i = 0;
+    
+    mat2 rot = mat2(
+        cos(uTime), sin(uTime),
+        -sin(uTime), cos(uTime)
+    );
+    float zoomFactor = pow(2.0, sin(uTime * 0.5));
+    mat2 zoom = mat2(
+        zoomFactor* 2.5, 0,
+        0, 2.5 * zoomFactor
+    );
+    
+    vec2 translation = vec2(0.33334,0.4201);
+    
+    uv = uv * rot * zoom + translation;
+    
+    for(i = 0;x*x + y*y <= 2.0*2.0 && i<max_iter;i++)
+    {
+        x_temp = x*x - y*y + uv.x;
+        y = 2.0*x*y + uv.y;
+        x = x_temp;
+    }
+    
+    float log_zn;
+    float nu;
+    float i_float = float(i);
+    if (i == max_iter) {
+        i = 0;
+        i_float = 0.0;
+    }
+    else if (i < max_iter) {
+        log_zn = log(x*x + y*y) / 2.0;
+        nu = log((log_zn / log(2.0))) / log(2.0);
+        i_float = i_float - nu;
+    }
+
+    
+
+    //vec3 col = vec3(x,y,0.0);
+    vec3 col = vec3(i_float*0.01,i_float*0.01,0);
+    col.x = 0.2;
+    float parina = 1000.0*pow(col.y, 0.05+0.05*sin(uTime));
+    col.y = 0;
+    col.z = abs(0.5 - 0.5*cos(parina))+0.00001;
+
     Material mat;
-    mat.albedo = vec3(0.926,0.721,0.504);
-    mat.metallic = 1;
-    mat.roughness = 0.1;
+    mat.albedo = vec3(0.2342,0.8685,.98981);
+    mat.metallic = 10;
+    mat.roughness = 1;
 
     vec3 l = normalize(vec3(1, 1, -1));
-    vec3 ret =  evalBRDF(n, v, l, mat) * vec3(3);
-    ret += bg(-reflect(-v, n)) * 0.1;
+    vec3 ret =  evalBRDF(n, v, l, mat) * vec3(col.x*.3,col.y*.3,col.z);
+    ret += bg(-reflect(-v, n)) * 0.5;
     return ret;
 }
 
@@ -113,7 +217,7 @@ void main()
     // Trace them spheres
     vec2 t = march(ro, rd, 0.001, 128, 256);
     if (t.x > 128) {
-        fragColor = vec4(bg(rd), 1);
+        fragColor = vec4(bg(rd), 1.1);
         return;
     }
 
