@@ -3,7 +3,7 @@
 #include <cstdio>
 
 namespace {
-    static int32_t ROW_RATE = 0;
+    static float ROW_PER_S = 0.f;
 }
 
 void AudioStream::pauseStream(void* data, int32_t flag)
@@ -20,7 +20,7 @@ void AudioStream::pauseStream(void* data, int32_t flag)
 
 void AudioStream::setStreamRow(void* /*data*/, int32_t row)
 {
-    double const timeS = row / (double)ROW_RATE;
+    double const timeS = row / (double)ROW_PER_S;
     Mix_SetMusicPosition(timeS);
 }
 
@@ -60,7 +60,7 @@ bool AudioStream::init(const std::string& filePath, double bpm, int32_t rpb)
         return false;
     }
 
-    ROW_RATE = bpm / 60 * rpb;
+    ROW_PER_S = bpm / 60.f * (float)rpb;
     _shouldRestart = false;
     return true;
 }
@@ -102,7 +102,7 @@ void AudioStream::stop()
 double AudioStream::getRow()
 {
     double timeS = getTimeS();
-    return timeS * ROW_RATE;
+    return timeS * ROW_PER_S;
 }
 
 double AudioStream::getTimeS() {
@@ -112,7 +112,7 @@ double AudioStream::getTimeS() {
         double const mixTimeS = Mix_GetMusicPosition(_music);
 
         // Smooth over the coarse API timestamps for animation
-        // Idea from SoLoud docs https://solhsa.com/soloud/coremisc.html 
+        // Idea from SoLoud docs https://solhsa.com/soloud/coremisc.html
         auto const now = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> const dt = now - _prevTimeStamp;
         // Fudge a polling-rate based history weight
@@ -135,7 +135,7 @@ void AudioStream::setTimeS(double timeS)
 
 void AudioStream::setRow(int32_t row)
 {
-    double const timeS = row / (double)ROW_RATE;
+    double const timeS = row / (double)ROW_PER_S;
     Mix_SetMusicPosition(timeS);
     _timeS = timeS;
 }
