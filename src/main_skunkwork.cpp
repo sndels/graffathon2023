@@ -161,12 +161,14 @@ int main(int argc, char *argv[])
 
     FrameBuffer scenePingFbo(XRES, YRES, sceneTexParams);
     FrameBuffer scenePongFbo(XRES, YRES, sceneTexParams);
-    FrameBuffer compositeFbo(XRES, YRES, {rgba16fParams, rgba32fParams, rgba32fParams, rgba32fParams, rgba32fParams});
+    FrameBuffer compositePingFbo(XRES, YRES, {rgba16fParams, rgba32fParams, rgba32fParams, rgba32fParams, rgba32fParams});
+    FrameBuffer compositePongFbo(XRES, YRES, {rgba16fParams, rgba32fParams, rgba32fParams, rgba32fParams, rgba32fParams});
 
     AudioStream::getInstance().play();
 
     int32_t overrideIndex = -1;
 
+    bool compositePong = false;
     // Run the main loop
     while (window.open()) {
         bool const resized = window.startFrame();
@@ -184,7 +186,8 @@ int main(int argc, char *argv[])
         if (resized) {
             scenePingFbo.resize(window.width(), window.height());
             scenePongFbo.resize(window.width(), window.height());
-            compositeFbo.resize(window.width(), window.height());
+            compositePingFbo.resize(window.width(), window.height());
+            compositePongFbo.resize(window.width(), window.height());
         }
 
         // Sync
@@ -276,7 +279,12 @@ int main(int argc, char *argv[])
 
             compositeProf.startSample();
             compositeShader.bind(syncRow);
-            compositeFbo.bindWrite();
+            if (!compositePong) {
+                compositePongFbo.bindWrite();
+            }
+            else {
+                compositePingFbo.bindWrite();
+            }
             compositeShader.setFloat(
                 "uTime",
                 gui.useSliderTime() ? gui.sliderTime() : globalTime.getSeconds()
@@ -284,10 +292,19 @@ int main(int argc, char *argv[])
             compositeShader.setVec2("uRes", (GLfloat)window.width(), (GLfloat)window.height());
             scenePingFbo.bindRead(0, GL_TEXTURE0, compositeShader.getUniformLocation("uScenePingColorDepth"));
             scenePongFbo.bindRead(0, GL_TEXTURE1, compositeShader.getUniformLocation("uScenePongColorDepth"));
-            compositeFbo.bindRead(1, GL_TEXTURE2, compositeShader.getUniformLocation("uPrevPing"));
-            compositeFbo.bindRead(2, GL_TEXTURE3, compositeShader.getUniformLocation("uPrevPong"));
-            compositeFbo.bindRead(3, GL_TEXTURE4, compositeShader.getUniformLocation("uFlow"));
-            compositeFbo.bindRead(4, GL_TEXTURE5, compositeShader.getUniformLocation("uColorFeedback"));
+
+            if (compositePong) {
+                compositePongFbo.bindRead(1, GL_TEXTURE2, compositeShader.getUniformLocation("uPrevPing"));
+                compositePongFbo.bindRead(2, GL_TEXTURE3, compositeShader.getUniformLocation("uPrevPong"));
+                compositePongFbo.bindRead(3, GL_TEXTURE4, compositeShader.getUniformLocation("uFlow"));
+                compositePongFbo.bindRead(4, GL_TEXTURE5, compositeShader.getUniformLocation("uColorFeedback"));
+            }
+            else {
+                compositePingFbo.bindRead(1, GL_TEXTURE2, compositeShader.getUniformLocation("uPrevPing"));
+                compositePingFbo.bindRead(2, GL_TEXTURE3, compositeShader.getUniformLocation("uPrevPong"));
+                compositePingFbo.bindRead(3, GL_TEXTURE4, compositeShader.getUniformLocation("uFlow"));
+                compositePingFbo.bindRead(4, GL_TEXTURE5, compositeShader.getUniformLocation("uColorFeedback"));
+            }
             q.render();
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
             compositeProf.endSample();
@@ -299,9 +316,17 @@ int main(int argc, char *argv[])
                 gui.useSliderTime() ? gui.sliderTime() : globalTime.getSeconds()
             );
             quadShader.setVec2("uRes", (GLfloat)window.width(), (GLfloat)window.height());
-            compositeFbo.bindRead(0, GL_TEXTURE6, quadShader.getUniformLocation("uQuad"));
+
+            if (compositePong) {
+                compositePongFbo.bindRead(0, GL_TEXTURE6, quadShader.getUniformLocation("uQuad"));
+            }
+            else {
+                compositePingFbo.bindRead(0, GL_TEXTURE6, quadShader.getUniformLocation("uQuad"));
+            }
             q.render();
             quadProf.endSample();
+
+            compositePong = !compositePong;
         }
 
 #ifndef DEMO_MODE
