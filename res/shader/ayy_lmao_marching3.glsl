@@ -24,12 +24,13 @@ vec2 scene(vec3 p)
         // pModMirror2(pp.xy, vec2(.4, .4));
         pR(pp.xz, uTime*4.0);
         pR(pp.yz, uTime);
-        float d = fIcosahedron(pp, 0.1, 18.);
+        float sz = 0.4;
+        float d = fIcosahedron(pp, sz, 40.);
 
-        pp = p - vec3(0.07,0,0);
+        pp = p - vec3(sz*0.5,0,0);
         pR(pp.xz, -uTime*4.0+0.6);
         // pR(pp.yz, uTime*7.0 + 1.0);
-        float dd = fIcosahedron(pp, 0.1,20.);
+        float dd = fIcosahedron(pp, sz,40.);
 
         // d = fOpIntersectionRound(d, dd, 0.05);
         // d = fOpUnionChamfer(d, dd, 0.05);

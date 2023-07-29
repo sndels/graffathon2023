@@ -14,6 +14,7 @@ out vec4 fragColor;
 vec3 bg(vec3 d) {
     return mix(vec3(0), vec3(1), d.y);
 }
+
 // Returns distance to hit and material index
 vec2 scene(vec3 p)
 {
@@ -21,10 +22,21 @@ vec2 scene(vec3 p)
 
     {
         vec3 pp = p;
-        float sqf = 0.15;
-        float sq = sin(uTime*sqf) + sin(3.*uTime*sqf)*0.33;
-        sq = sq + 1.33;
-        pR(pp.xz, uTime*0.003*sq);
+        pR(pp.xz, uTime*0.1);
+
+        float k = 1.5 * sin(uTime*0.9) + 0.1 * sin(uTime*10.0); // tweak me baby
+        float c = cos(k*pp.y)*cos(k*pp.z);
+        float s = sin(k*pp.y);
+        mat2  m = mat2(c,-s,s,c);
+        vec3  q = vec3(m*pp.xz, pp.y);
+
+        pp = q;
+        // pModPolar(pp.xy, 13.0);
+        // pModPolar(pp.yz, 17.0);
+        vec3 mynorm = vec3(1.0,0.0,0.05);
+        pp.x += pp.y * 0.005;
+        pReflect(pp, mynorm, 0.07*(sin(uTime*0.05)+0.5));
+
         float d = fSphere(pp, 1.0);
         float dism = sin(20.0*pp.x)*sin(20.1*pp.y)*sin(19.99*pp.z);
         float a = 0.15 * sin(uTime * 1. + 100.0);
@@ -33,6 +45,20 @@ vec2 scene(vec3 p)
         float aaaa = 0.0005 * sin(uTime * 500.0 + 7.0);
         float cycle = 0.5 * (a + aa + aaa + aaaa);
         d = d + dism*cycle;
+
+
+        pp = p;
+        pp -= vec3(0.0, 0.0, -5.0);
+        float box = fBox(pp, vec3(100.0, 5.0, 5.0));
+        
+        // d = box; //tmp
+        d = fOpDifferenceRound(d, box, 1.0);
+
+
+
+
+
+
         h = d < h.x ? vec2(d, 0) : h;
     }
 

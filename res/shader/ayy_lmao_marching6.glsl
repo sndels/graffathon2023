@@ -39,6 +39,13 @@ vec2 scene(vec3 p)
         float aaaa = 0.0005 * sin(uTime * 500.0 + 7.0);
         float cycle = 0.5 * (a + aa + aaa + aaaa);
         d = d + dism*cycle;
+
+        pp = p;
+        pp -= vec3(0.0, 0.0, -5.0);
+        float box = fBox(pp, vec3(100.0, 5.0, 5.0));
+        
+        // d = box; //tmp
+        d = fOpDifferenceRound(d, box, 1.0);
         h = d < h.x ? vec2(d, 0) : h;
     }
 

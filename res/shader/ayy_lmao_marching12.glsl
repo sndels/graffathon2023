@@ -72,7 +72,7 @@ vec2 march(vec3 ro, vec3 rd, float prec, float tMax, int iMax)
     return t;
 }
 
-uniform vec3 dColor;
+uniform vec3 dColor = vec3(0.442,0.166,0.513);
 vec3 shade(vec3 p, vec3 n, vec3 v, float m)
 {
     Material mat;
@@ -82,7 +82,7 @@ vec3 shade(vec3 p, vec3 n, vec3 v, float m)
 
     vec3 l = normalize(vec3(1, 1, -1));
 
-    vec3 ret = evalBRDF(n, v, l, mat) * vec3(150.) * length(vec3(1.0)/p);
+    vec3 ret = evalBRDF(n, v, l, mat) * vec3(150000.) * length(vec3(1.0)/p);
     v = -reflect(-v, n);
     ret += evalBRDF(n, v, l, mat) * bg(v);
     return ret;

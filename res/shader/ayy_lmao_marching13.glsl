@@ -30,11 +30,8 @@ vec3 opRep( in vec3 p, in vec3 c)
 vec2 scene(vec3 p)
 {
     vec2 h = vec2(INF);
-    // float d = length(p);
-    // p.x *= 0.5;
     vec3 pr = p;
     pr.x += pr.y * 0.1;
-
 
     pr -= vec3(0.0, 2.0, 30.0);
     pR(pr.xz, uTime*0.9);
