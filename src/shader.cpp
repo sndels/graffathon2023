@@ -151,7 +151,7 @@ void Shader::setVec2(const std::string& name, GLfloat x, GLfloat y)
 GLint Shader::getUniformLocation(const std::string& name) const
 {
     GLint uniformLocation = glGetUniformLocation(_progID, name.c_str());
-    if (uniformLocation == -1) 
+    if (uniformLocation == -1)
         printf("[shader] %s is not a valid shader variable\n", name.c_str());
     return uniformLocation;
 }
@@ -337,6 +337,7 @@ GLuint Shader::loadShader(const std::string& mainPath, GLenum shaderType)
         glGetShaderiv(shaderID, GL_COMPILE_STATUS, &shaderCompiled);
         if (shaderCompiled == GL_FALSE) {
             printf("[shader] Unable to compile shader %u\n", shaderID);
+            printf("[shader] %s\n", mainPath.c_str());
             printShaderLog(shaderID);
             shaderID = 0;
         }
