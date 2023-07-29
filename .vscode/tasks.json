@@ -93,6 +93,7 @@
                 "Ninja",
                 "-B",
                 "build",
+                "-DDISTRIBUTE_DEMO=0"
             ],
             "options": {
                 "env": {
