@@ -25,7 +25,7 @@ const float bpm = 145.0 / 4;
 float beat = uTime * (bpm / 60);
 float bv = (sin(beat * 4 * 3.1415) + 1) * 30.4;
 
-uniform float dPos;
+uniform float rPos;
 
 
 

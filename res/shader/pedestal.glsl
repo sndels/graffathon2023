@@ -27,7 +27,7 @@ vec3 xform(vec3 p)
 {
     p.x += 2.5;
     float v = -sin(uTime * 3.1415 / 60 * 145) * 1 + 0.5;
-    p.z -= uTime * -2.5 - v;
+    p.z -= uTime * -6.0 - v + 1.0;
         //pR(p.xz, uTime);
     pModMirror2(p.xz, vec2(5));
     return p;
@@ -212,7 +212,7 @@ vec3 lookAt(vec3 eye, vec3 target, vec3 viewRay) {
 
 uniform vec3 dCamPos;
 uniform vec3 dCamDir;
-uniform vec3 dCamTarget = vec3(0, 1, 0);
+uniform vec3 dCamTarget = vec3(0, 1.5, 0);
 
 void main()
 {
