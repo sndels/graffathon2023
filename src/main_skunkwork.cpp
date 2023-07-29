@@ -115,6 +115,7 @@ int main(int argc, char *argv[])
 
 
     sceneShaders.emplace_back("Text", rocket, vertPath, RES_DIRECTORY "shader/text_frag.glsl");
+    sceneShaders.emplace_back("2DishSpaceTwister", rocket, vertPath, RES_DIRECTORY "shader/2dish_space_twister_frag.glsl");
     sceneShaders.emplace_back("IcoDodecaSpikeBlend", rocket, vertPath, RES_DIRECTORY "shader/ico_dodeca_spike_blend_frag.glsl");
     sceneShaders.emplace_back("IcoDodecaSpikeBlend2", rocket, vertPath, RES_DIRECTORY "shader/ico_dodeca_spike_blend2_frag.glsl");
     sceneShaders.emplace_back("LooneyTunnelTwoDee", rocket, vertPath, RES_DIRECTORY "shader/kukkatunneli.glsl");
