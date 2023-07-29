@@ -23,7 +23,7 @@ layout(location = 4) out vec4 colorFeedback;
 
 #define ABERR_SAMPLES 16
 
-#if 0
+uniform float dCaberr = .1;
 vec4 sampleSource(sampler2D s, float aberr)
 {
     vec2 texCoord = gl_FragCoord.xy / uRes;
@@ -42,12 +42,9 @@ vec4 sampleSource(sampler2D s, float aberr)
         }
 
         value.rgb = sum / ABERR_SAMPLES;
-    } 
+    }
     return value;
 }
-
-uniform float dCaberr;
-#endif
 
 vec2 pixelSize = 1.0 / uRes;
 vec2 texCoord = gl_FragCoord.xy / uRes;
@@ -115,6 +112,12 @@ void main()
         texture(uPrevPong, vec2(0,0)).r < -1
     )
         discard;
+
+    if (dCaberr > .1)
+    {
+        fragColor = sampleSource(uScenePingColorDepth, dCaberr - .1);
+        return;
+    }
 
     // init noise
     pcg_state = uvec3(gl_FragCoord.xy, uTime*120);
