@@ -19,10 +19,14 @@ const float min_rad2 = 0.15;
 #define scale_normalized (vec4(SCALE, SCALE, SCALE, abs(SCALE)) / min_rad2)
 
 uniform vec3 dAlbedo = vec3(0.926,0.721,0.502);
-uniform float dRough = 0.51;
+uniform float dRough = 1.23;
 
-const float bpm = 128.0 / 4;
+const float bpm = 145.0 / 4;
 float beat = uTime * (bpm / 60);
+float bv = (sin(beat * 4 * 3.1415) + 1) * 30.4;
+
+uniform float dPos;
+
 
 
 //----------------------------------------------------------------------------------------
@@ -33,9 +37,7 @@ float mandelbox(vec3 pos)
 	vec4 p0 = p;
 
 	//p.x += beat * 0.1;
-	float v = (sin(beat * 2 * 3.1415) + 1) * 10.4;
-
-	for (int i = 0; i < 9; i++)
+	for (int i = 0; i < 13; i++)
 	{
 		p.xyz = clamp(p.xyz, -1.0, 1.0) * 2.0 - p.xyz;
 
@@ -44,7 +46,7 @@ float mandelbox(vec3 pos)
 
 		p = p*scale_normalized + p0;
 	}
-	return ((length(p.xyz) - (SCALE + v - 1.0)) / p.w - pow(abs(SCALE), -7.5));
+	return ((length(p.xyz) - (SCALE + bv - 1.0)) / p.w - pow(abs(SCALE), -7.5 + bv * 0.01));
 }
 
 
@@ -60,12 +62,12 @@ vec2 scene(vec3 p)
     {
         vec3 pp = p;
         //pModMirror2(pp.xy, vec2(.4, .4));
-        pR(pp.xz, uTime);
-        pR(pp.yz, uTime);
-        pp.x += sin(uTime);
+        pR(pp.xz, dPos);
+        pR(pp.yz, dPos);
+        pp.x += sin(dPos);
         //float d = fIcosahedron(pp, 0.1, 30.);
         vec3 fp = p;
-        fp.x += uTime * 0.01;
+        fp.x += dPos * 0.01;
         fp.z += 0.02;
         float d = mandelbox(fp);
         h = d < h.x ? vec2(d, 0) : h;

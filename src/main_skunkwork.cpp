@@ -197,7 +197,7 @@ int main(int argc, char *argv[])
             sync_connect(rocket, "localhost", SYNC_DEFAULT_PORT);
 #endif // TCPROCKET
 
-        int32_t pingIndex = 5; std::clamp(
+        int32_t pingIndex = std::clamp(
             (int32_t)(float)sync_get_val(pingScene, syncRow), 0, (int32_t)sceneShaders.size() - 1);
         int32_t pongIndex = std::clamp(
             (int32_t)(float)sync_get_val(pongScene, syncRow), 0, (int32_t)sceneShaders.size() - 1);
