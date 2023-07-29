@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
     std::vector<Shader> sceneShaders;
     sceneShaders.emplace_back("Basic", rocket, vertPath, RES_DIRECTORY "shader/basic_frag.glsl");
     sceneShaders.emplace_back("RayMarch", rocket, vertPath, RES_DIRECTORY "shader/ray_marching_frag.glsl");
+    sceneShaders.emplace_back("Ayy", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching.glsl");
     sceneShaders.emplace_back("Text", rocket, vertPath, RES_DIRECTORY "shader/text_frag.glsl");
     sceneShaders.emplace_back("2DishSpaceTwister", rocket, vertPath, RES_DIRECTORY "shader/2dish_space_twister_frag.glsl");
     sceneShaders.emplace_back("IcoDodecaSpikeBlend", rocket, vertPath, RES_DIRECTORY "shader/ico_dodeca_spike_blend_frag.glsl");
