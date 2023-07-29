@@ -28,7 +28,7 @@ vec3 opRep( in vec3 p, in vec3 c)
 
 vec3 opTwist(in vec3 p )
 {
-    float k = 300.0 * (0.5 + sin(uTime));
+    float k = 1.0 * (0.5 + sin(uTime));
     float c = cos(k*p.y)*sin(k*k*p.z);
     float s = sin(k*p.y)*2.0;
     mat2  m = mat2(c,-s,s,c);
@@ -41,40 +41,32 @@ vec2 scene(vec3 p)
 {
     vec2 h = vec2(INF);
     vec3 pr = p;
-    pR(pr.xz, uTime);
-    pR(pr.xy, uTime * 0.99);
-
-    pReflect(pr, vec3(1.0,0.0,0.0), 0.2);
-    pReflect(pr, vec3(0.0,1.0,0.0), 0.2);
-    pReflect(pr, vec3(0.0,0.0,1.0), 0.2);
-
-    pMirrorOctant(pr.xy, vec2(sin(uTime)+0.5, 0.0));
-    pMirrorOctant(pr.xz, vec2(sin(uTime+PI)+0.5, 0.1 * sin(uTime)));
-    pMirrorOctant(pr.yz, vec2(1.0,0.0));
-
-    float d = fIcosahedron(pr, 0.5, 30.0);
-
-    pr = p;
-    float ball = fSphere(pr, (0.5 + 0.45*(0.5 + sin(uTime)*0.5)));
-    // d = min(d,ball);
-    // d = fOpUnionChamfer(d,ball,0.01);
-    pr = p;
-    // pr *= length(p);
     
-    pR(pr.yz, uTime * 3.0);
-    pR(pr.xz, uTime);
-    pR(pr.xy, uTime*0.5);
-    float disc = fCylinder(pr, 100.0, 0.08);
-    pr = p;
-    pR(pr.yz, uTime*0.9);
-    pR(pr.xz, uTime*7.);
-    pR(pr.xy, uTime*0.8);
-    float disc2 = fCylinder(pr, 100.0, 0.07);
-    disc = min(disc,disc2);
-    d = max(d,disc);
-    // d = disc;
+    pr -= vec3(0.0, 2.0, 30.0);
+    pR(pr.xz, uTime*0.9);
+    pR(pr.xy, uTime);
     
-    
+    float bleb = 12.0;
+    float pehmeys = 0.17;
+    float paksuus = 1.0;
+    pr = opRep(pr, vec3(2.0 * bleb));
+    float rod1 = sdRoundBox(pr, vec3(bleb, paksuus, paksuus), pehmeys);
+    float rod2 = sdRoundBox(pr, vec3(paksuus, bleb, paksuus), pehmeys);
+    float rod3 = sdRoundBox(pr, vec3(paksuus, paksuus, bleb), pehmeys);
+
+
+    pr = opTwist(pr);
+    float d = fOpUnionChamfer(rod1, rod2, 0.0);
+    d = fOpUnionChamfer(d, rod3, 0.0);
+    float kerroin = 0.16;
+    float kk = 0.25;
+    float disp = sin(2.0*pr.x + 0.17+uTime)*sin(2.5*pr.y+PI*0.5+uTime)*sin(1.6*pr.z+uTime)*kerroin +
+        sin(4.1*pr.x + 0.17)*sin(5.2*pr.y+PI*0.1)*sin(0.8*pr.z)*kerroin*kk +
+        sin(8.1*pr.x + 0.17)*sin(15.2*pr.y+PI*0.1)*sin(17.*pr.z)*kerroin*kk*kk +
+        sin(16.1*pr.x + 0.17)*sin(7.2*pr.y+PI*0.1)*sin(170.*pr.z)*kerroin*kk*kk*kk;
+
+    d += (0.5 * sin(uTime) + 0.5) * disp;
+
     h = d < h.x ? vec2(d, 0) : h;
     return h;
 }

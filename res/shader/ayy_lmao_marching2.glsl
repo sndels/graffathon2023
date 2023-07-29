@@ -14,68 +14,28 @@ out vec4 fragColor;
 vec3 bg(vec3 d) {
     return mix(vec3(0), vec3(1), d.y);
 }
-
-float sdRoundBox( vec3 p, vec3 b, float r )
-{
-  vec3 q = abs(p) - b;
-  return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0) - r;
-}
-
-vec3 opRep( in vec3 p, in vec3 c)
-{
-    return mod(p+0.5*c,c)-0.5*c;
-}
-
-vec3 opTwist(in vec3 p )
-{
-    float k = 300.0 * (0.5 + sin(uTime));
-    float c = cos(k*p.y)*sin(k*k*p.z);
-    float s = sin(k*p.y)*2.0;
-    mat2  m = mat2(c,-s,s,c);
-    vec3  q = vec3(m*p.xz,p.y);
-    return q;
-}
-
 // Returns distance to hit and material index
 vec2 scene(vec3 p)
 {
     vec2 h = vec2(INF);
-    vec3 pr = p;
-    pR(pr.xz, uTime);
-    pR(pr.xy, uTime * 0.99);
 
-    pReflect(pr, vec3(1.0,0.0,0.0), 0.2);
-    pReflect(pr, vec3(0.0,1.0,0.0), 0.2);
-    pReflect(pr, vec3(0.0,0.0,1.0), 0.2);
+    {
+        vec3 pp = p;
+        // pModMirror2(pp.xy, vec2(.4, .4));
+        pR(pp.xz, uTime*4.0);
+        pR(pp.yz, uTime);
+        float d = fIcosahedron(pp, 0.15, 30.);
 
-    pMirrorOctant(pr.xy, vec2(sin(uTime)+0.5, 0.0));
-    pMirrorOctant(pr.xz, vec2(sin(uTime+PI)+0.5, 0.1 * sin(uTime)));
-    pMirrorOctant(pr.yz, vec2(1.0,0.0));
+        pp = p - vec3(0.45,0,0);
+        pR(pp.xz, -uTime*4.0);
+        pR(pp.yz, uTime);
+        float dd = fIcosahedron(pp, 0.15,30.);
 
-    float d = fIcosahedron(pr, 0.5, 30.0);
+        d = fOpUnionChamfer(d, dd, 0.5);
+        d = min(d,dd);
+        h = d < h.x ? vec2(d, 0) : h;
+    }
 
-    pr = p;
-    float ball = fSphere(pr, (0.5 + 0.45*(0.5 + sin(uTime)*0.5)));
-    // d = min(d,ball);
-    // d = fOpUnionChamfer(d,ball,0.01);
-    pr = p;
-    // pr *= length(p);
-    
-    pR(pr.yz, uTime * 3.0);
-    pR(pr.xz, uTime);
-    pR(pr.xy, uTime*0.5);
-    float disc = fCylinder(pr, 100.0, 0.08);
-    pr = p;
-    pR(pr.yz, uTime*0.9);
-    pR(pr.xz, uTime*7.);
-    pR(pr.xy, uTime*0.8);
-    float disc2 = fCylinder(pr, 100.0, 0.07);
-    disc = min(disc,disc2);
-    d = max(d,disc);
-    // d = disc;
-    
-    
-    h = d < h.x ? vec2(d, 0) : h;
     return h;
 }
 
@@ -95,19 +55,16 @@ vec2 march(vec3 ro, vec3 rd, float prec, float tMax, int iMax)
     return t;
 }
 
-uniform vec3 dColor = vec3(0.442,0.166,0.513);
 vec3 shade(vec3 p, vec3 n, vec3 v, float m)
 {
     Material mat;
-    mat.albedo = dColor;
+    mat.albedo = vec3(0.926,0.721,0.504);
     mat.metallic = 1;
     mat.roughness = 0.1;
 
     vec3 l = normalize(vec3(1, 1, -1));
-
-    vec3 ret = evalBRDF(n, v, l, mat) / length((p-vec3(0.0, 3.0, 30.0)) * vec3(0.00005));
-    v = -reflect(-v, n);
-    ret += evalBRDF(n, v, l, mat) * bg(v);
+    vec3 ret =  evalBRDF(n, v, l, mat) * vec3(3);
+    ret += bg(-reflect(-v, n)) * 0.1;
     return ret;
 }
 
@@ -147,7 +104,6 @@ uniform vec3 dCamTarget;
 
 void main()
 {
-
     // Avoid nags if these aren't used
     if (uTime < -1 || uRes.x < -1)
         discard;
@@ -163,9 +119,8 @@ void main()
     //   pR(rd.xz, dCamDir.x);
 
     // Trace them spheres
-    float tmax = 1024;
-    vec2 t = march(ro, rd, 0.001, tmax, 256);
-    if (t.x > tmax) {
+    vec2 t = march(ro, rd, 0.001, 128, 256);
+    if (t.x > 128) {
         fragColor = vec4(bg(rd), 1);
         return;
     }

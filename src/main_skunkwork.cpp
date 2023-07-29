@@ -90,6 +90,26 @@ int main(int argc, char *argv[])
     sceneShaders.emplace_back("Basic", rocket, vertPath, RES_DIRECTORY "shader/basic_frag.glsl");
     sceneShaders.emplace_back("RayMarch", rocket, vertPath, RES_DIRECTORY "shader/ray_marching_frag.glsl");
     sceneShaders.emplace_back("Ayy", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching.glsl");
+    sceneShaders.emplace_back("Ayy2", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching2.glsl");
+    sceneShaders.emplace_back("Ayy3", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching3.glsl");
+    sceneShaders.emplace_back("Ayy4", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching4.glsl");
+    sceneShaders.emplace_back("Ayy5", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching5.glsl");
+    sceneShaders.emplace_back("Ayy6", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching6.glsl");
+    sceneShaders.emplace_back("Ayy7", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching7.glsl");
+    sceneShaders.emplace_back("Ayy8", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching8.glsl");
+    sceneShaders.emplace_back("Ayy9", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching9.glsl");
+    sceneShaders.emplace_back("Ayy10", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching10.glsl");
+    sceneShaders.emplace_back("Ayy11", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching11glsl");
+    sceneShaders.emplace_back("Ayy12", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching12.glsl");
+    sceneShaders.emplace_back("Ayy13", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching13.glsl");
+    sceneShaders.emplace_back("Ayy14", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching14.glsl");
+    sceneShaders.emplace_back("Ayy15", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching15.glsl");
+    sceneShaders.emplace_back("Ayy16", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching16.glsl");
+    sceneShaders.emplace_back("Ayy17", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching17.glsl");
+    sceneShaders.emplace_back("Ayy18", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching18.glsl");
+    sceneShaders.emplace_back("Ayy19", rocket, vertPath, RES_DIRECTORY "shader/ayy_lmao_marching19.glsl");
+
+
     sceneShaders.emplace_back("Text", rocket, vertPath, RES_DIRECTORY "shader/text_frag.glsl");
     sceneShaders.emplace_back("2DishSpaceTwister", rocket, vertPath, RES_DIRECTORY "shader/2dish_space_twister_frag.glsl");
     sceneShaders.emplace_back("IcoDodecaSpikeBlend", rocket, vertPath, RES_DIRECTORY "shader/ico_dodeca_spike_blend_frag.glsl");
