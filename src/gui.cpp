@@ -4,6 +4,7 @@
 #include <imgui_impl_sdl.h>
 #include <imgui_impl_opengl3.h>
 
+#include <algorithm>
 #include <cstdio>
 
 namespace {
@@ -85,35 +86,50 @@ void GUI::startFrame(
         timeS = 0.f;
     _sliderTime = timeS;
 
-    for (auto* s : shaders)
+    static int comboIndex = 0;
+    comboIndex = std::clamp(comboIndex, 0, (int)shaders.size()-1);
+    if (ImGui::BeginCombo("##ShaderDropdown", shaders[comboIndex]->name().c_str(), 0))
     {
-        assert(s != nullptr);
-        if (ImGui::CollapsingHeader(s->name().c_str()))
+        for (auto i = 0; i < shaders.size(); ++i)
         {
-            for (auto& e : s->dynamicUniforms()) {
-                std::string name = e.first + "##" + s->name();
-                Uniform& uniform = e.second;
-                switch (uniform.type) {
-                case UniformType::Float:
-                    uniformOffset();
-                    ImGui::DragFloat(name.c_str(), uniform.value, 0.01f);
-                    break;
-                case UniformType::Vec2:
-                    uniformOffset();
-                    ImGui::DragFloat2(name.c_str(), uniform.value, 0.01f);
-                    break;
-                case UniformType::Vec3:
-                    ImGui::ColorEdit3(
-                        std::string("##" + name).c_str(),
-                        uniform.value,
-                        ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_PickerHueWheel
-                    );
-                    ImGui::SameLine(); ImGui::DragFloat3(name.c_str(), uniform.value, 0.01f);
-                    break;
-                default:
-                    printf("[gui] Unknown dynamic uniform type\n");
-                    break;
-                }
+            auto* s = shaders[i];
+            assert(s != nullptr);
+            bool selected = comboIndex == i;
+            if (ImGui::Selectable(s->name().c_str(), selected))
+                comboIndex = i;
+
+            if (selected)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+    }
+
+    {
+        auto* s = shaders[comboIndex];
+        assert(s != nullptr);
+        for (auto& e : s->dynamicUniforms()) {
+            std::string name = e.first + "##" + s->name();
+            Uniform& uniform = e.second;
+            switch (uniform.type) {
+            case UniformType::Float:
+                uniformOffset();
+                ImGui::DragFloat(name.c_str(), uniform.value, 0.01f);
+                break;
+            case UniformType::Vec2:
+                uniformOffset();
+                ImGui::DragFloat2(name.c_str(), uniform.value, 0.01f);
+                break;
+            case UniformType::Vec3:
+                ImGui::ColorEdit3(
+                    std::string("##" + name).c_str(),
+                    uniform.value,
+                    ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_PickerHueWheel
+                );
+                ImGui::SameLine(); ImGui::DragFloat3(name.c_str(), uniform.value, 0.01f);
+                break;
+            default:
+                printf("[gui] Unknown dynamic uniform type\n");
+                break;
             }
         }
     }
