@@ -23,7 +23,7 @@ layout(location = 4) out vec4 colorFeedback;
 
 #define ABERR_SAMPLES 16
 
-uniform float dCaberr = .1;
+uniform float dCaberr = .0;
 vec4 sampleSource(sampler2D s, float aberr)
 {
     vec2 texCoord = gl_FragCoord.xy / uRes;
