@@ -32,7 +32,7 @@ vec2 scene(vec3 p)
         pR(pp.xz, .3);
         pModMirror1(p.x, 2.);
         float d = fIcosahedron(pp, 4.);
-        d = mix(d, fDodecahedron(pp, 3.), cos(uTime));
+        d = mix(d, fDodecahedron(pp, 3.5), cos(uTime * 8));
 
         pp = p;
         pR(pp.xy, PI / 4);
@@ -40,7 +40,7 @@ vec2 scene(vec3 p)
         pR(pp.xz, uTime * .2);
         pp -= vec3(.0, fract(uTime) * 2, .0);
         pMod1(pp.y, 2.);
-        d = fOpDifferenceChamfer(d, fBox(pp, vec3(100., abs(sin(uTime)) * .4, 100.)), .1);
+        d = fOpDifferenceChamfer(d, fBox(pp, vec3(100., abs(sin(uTime * 8)) * .4, 100.)), .1);
         d -= .1;
 
         h = d < h.x ? vec2(d, 1) : h;

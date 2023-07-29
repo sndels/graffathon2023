@@ -116,6 +116,7 @@ int main(int argc, char *argv[])
     sceneShaders.emplace_back("Text", rocket, vertPath, RES_DIRECTORY "shader/text_frag.glsl");
     sceneShaders.emplace_back("2DishSpaceTwister", rocket, vertPath, RES_DIRECTORY "shader/2dish_space_twister_frag.glsl");
     sceneShaders.emplace_back("IcoDodecaSpikeBlend", rocket, vertPath, RES_DIRECTORY "shader/ico_dodeca_spike_blend_frag.glsl");
+    sceneShaders.emplace_back("IcoDodecaSpikeBlend2", rocket, vertPath, RES_DIRECTORY "shader/ico_dodeca_spike_blend2_frag.glsl");
     sceneShaders.emplace_back("LooneyTunnelTwoDee", rocket, vertPath, RES_DIRECTORY "shader/kukkatunneli.glsl");
     Shader compositeShader("Composite", rocket, vertPath, RES_DIRECTORY "shader/composite_frag.glsl");
     Shader quadShader("Quad", rocket, vertPath, RES_DIRECTORY "shader/render_quad_frag.glsl");
@@ -195,7 +196,7 @@ int main(int argc, char *argv[])
             sync_connect(rocket, "localhost", SYNC_DEFAULT_PORT);
 #endif // TCPROCKET
 
-        int32_t pingIndex = std::clamp(
+        int32_t pingIndex = 5; std::clamp(
             (int32_t)(float)sync_get_val(pingScene, syncRow), 0, (int32_t)sceneShaders.size() - 1);
         int32_t pongIndex = std::clamp(
             (int32_t)(float)sync_get_val(pongScene, syncRow), 0, (int32_t)sceneShaders.size() - 1);
