@@ -62,12 +62,12 @@ vec2 scene(vec3 p)
     {
         vec3 pp = p;
         //pModMirror2(pp.xy, vec2(.4, .4));
-        pR(pp.xz, dPos);
-        pR(pp.yz, dPos);
-        pp.x += sin(dPos);
+        pR(pp.xz, rPos);
+        pR(pp.yz, rPos);
+        pp.x += sin(rPos);
         //float d = fIcosahedron(pp, 0.1, 30.);
         vec3 fp = p;
-        fp.x += dPos * 0.01;
+        fp.x += rPos * 0.01;
         fp.z += 0.02;
         float d = mandelbox(fp);
         h = d < h.x ? vec2(d, 0) : h;
