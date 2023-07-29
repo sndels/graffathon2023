@@ -163,7 +163,7 @@ vec3 shade(vec3 p, vec3 n, vec3 v, float m)
     //vec3 col = vec3(x,y,0.0);
     vec3 col = vec3(i_float*0.01,i_float*0.01,0);
     col.x = 0.2;
-    float parina = 1000.0*pow(col.y, 0.05+0.05*abs(sin(uTime)));
+    float parina = 100.0*pow(col.y, 0.05+0.05*abs(sin(uTime)));
     col.y = 0;
     col.z = abs(0.5 - 0.5*cos(parina))+0.00001;
 
