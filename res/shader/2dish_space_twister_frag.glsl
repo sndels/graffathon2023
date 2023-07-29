@@ -10,12 +10,12 @@ out vec4 fragColor;
 
 #define INF (1.0/0.0)
 
-uniform vec3 dColor;
+uniform vec3 dColor = vec3(0.951, 0.727, 0.099);
 uniform vec3 dPos;
 uniform vec3 dRot;
 
 vec3 bg(vec3 d) {
-    return vec3(0.951, 0.727, 0.099);//dColor;
+    return vec3(.09, .1, .06);
 }
 
 // Returns distance to hit and material index
@@ -23,28 +23,28 @@ vec2 scene(vec3 p)
 {
     vec2 h = vec2(INF);
 
-    // {
-    //     vec3 pp = p;
-    //     pModPolar(pp.xy, 7.);
-    //     pMirror(pp.y, 0.5);
-    //     pMod1(pp.z, 10);
-    //     pp -= dPos;
-    //     pR(pp.xz, cos(PI * uTime));
-    //     pR(pp.yz, sin(.5 * uTime));
-    //     pR(pp.xy, uTime);
-    //     float d = fBox(pp, vec3(.2, 1000., .2));
-    //     h = d < h.x ? vec2(d, 1) : h;
-    // }
-
     {
         vec3 pp = p;
         pModPolar(pp.xy, 7.);
         pMirror(pp.y, 0.5);
         pMod1(pp.z, 10);
-        pp -= dPos;
-        pR(pp.xz, cos(PI * uTime));
-        pR(pp.yz, sin(.5 * uTime));
+        pp -= vec3(2.68, .49, 1.63);
+        pR(pp.xz, cos(PI / 4. * uTime));
+        pR(pp.yz, sin(.25 * uTime));
         pR(pp.xy, uTime);
+        float d = fBox(pp, vec3(.2, 1000., .2));
+        h = d < h.x ? vec2(d, 0) : h;
+    }
+
+    {
+        vec3 pp = p;
+        pModPolar(pp.xy, 3.);
+        pMirror(pp.y, 0.5);
+        pMod1(pp.z, 10);
+        pp -= vec3(2.68, .49, 1.63) * 2;
+        pR(pp.yz, sin(uTime - 2));
+        pR(pp.xy, uTime - 2);
+        pR(pp.xz, cos(2 * PI * (uTime - 2)));
         float d = fBox(pp, vec3(.2, 1000., .2));
         h = d < h.x ? vec2(d, 1) : h;
     }
@@ -110,7 +110,9 @@ vec2 marchEnhanced(vec3 ro, vec3 rd, float pixelRadius, float tMax, int iMax) {
 
 vec3 shade(vec3 p, vec3 n, vec3 v, float m)
 {
-    return vec3(1);
+    if (m == 0.)
+        return vec3(.3, .061, .5);
+    return vec3(.77, .9, .022);
 }
 
 vec3 normal(vec3 p)
