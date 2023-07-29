@@ -163,15 +163,12 @@
             "dependsOn":[
                 "cmake vs distribute"
             ],
-            "command": "(mkdir",
+            "command": "cp",
             "args": [
-                "-p",
-                "build/skunkwork_dist)",
-                "-and",
-                "(cp",
                 "-r",
+                "-Force",
                 "res",
-                "build/skunkwork_dist/)"
+                "build/skunkwork_dist"
             ],
             "presentation": {
                 // Reveal the output only if unrecognized errors occur.
