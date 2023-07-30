@@ -21,8 +21,10 @@ vec2 scene(vec3 p)
     vec2 h = vec2(INF);
 
     {
+        p.xyz = -p.xzy;
         vec3 pp = p;
-        pR(pp.xz, uTime*0.1);
+        // pR(pp.xz, uTime*0.1);
+        pR(pp.yx, uTime*0.45 - PI*0.5);
 
         float k = 1.5 * sin(uTime*0.9) + 0.1 * sin(uTime*10.0); // tweak me baby
         float c = cos(k*pp.y) + 0.15 * cos(1.0 + 7.0*k*pp.z);
