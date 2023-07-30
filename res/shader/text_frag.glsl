@@ -110,10 +110,10 @@ void main()
     const int CHAR_COUNT_CREDITS = 90;
     const int CHARS_CREDITS[CHAR_COUNT_CREDITS]= int[](30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,19,14,30,1,4,30,3,4,2,8,3,4,3,30,28,30,7,24,17,19,18,8,30,11,4,7,3,0,17,8,30,13,17,10,30,18,13,3,4,11,18,30,19,10,11,13,30,28,30,0,18,30,6,17,0,5,5,0,30,1,14,8,18,30);
 
-    const int CHAR_COUNT_LOREM = 402;
-    const int CHARS_LOREM[CHAR_COUNT_LOREM] = int[](99,14,17,4,12,30,8,15,18,20,12,30,3,14,11,14,17,30,18,8,19,30,0,12,4,19,99,30,2,14,13,18,4,2,19,4,19,20,17,30,0,3,8,15,8,18,2,8,13,6,30,4,11,8,19,99,30,18,4,3,30,3,14,30,4,8,20,18,12,14,3,30,19,4,12,15,14,17,30,8,13,2,8,3,8,3,20,13,19,30,20,19,30,11,0,1,14,17,4,30,4,19,30,3,14,11,14,17,4,30,12,0,6,13,0,30,0,11,8,16,20,0,99,30,99,8,2,19,20,12,18,19,30,16,20,8,18,16,20,4,30,18,0,6,8,19,19,8,18,30,15,20,17,20,18,30,18,8,19,99,30,99,4,11,8,19,30,20,19,30,19,14,17,19,14,17,30,15,17,4,19,8,20,12,30,21,8,21,4,17,17,0,30,18,20,18,15,4,13,3,8,18,18,4,30,15,14,19,4,13,19,8,30,13,20,11,11,0,12,99,30,99,11,0,13,3,8,19,30,21,14,11,20,19,15,0,19,30,12,0,4,2,4,13,0,18,30,21,14,11,20,19,15,0,19,30,1,11,0,13,3,8,19,30,0,11,8,16,20,0,12,30,4,19,8,0,12,99,30,99,20,8,18,30,11,4,2,19,20,18,30,13,20,11,11,0,30,0,19,30,21,14,11,20,19,15,0,19,99,30,99,6,4,19,30,4,6,4,18,19,0,18,30,15,20,17,20,18,30,21,8,21,4,17,17,0,30,0,2,2,20,12,18,0,13,30,8,13,30,13,8,18,11,30,13,8,18,8,99,30,99,20,17,15,8,18,30,12,0,18,18,0,30,18,4,3,30,4,11,4,12,4,13,19,20,12,30,19,4,12,15,20,18,30,4,6,4,18,19,0,18,99);
+    const int CHAR_COUNT_GREETS = 168;
+    const int CHARS_GREETS[CHAR_COUNT_GREETS]= int[](30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,30,0,11,19,0,8,17,30,28,30,0,18,3,30,28,30,1,0,3,30,5,4,11,8,23,30,28,30,30,2,14,13,18,15,8,17,0,2,24,30,28,30,3,4,11,8,1,4,17,0,19,4,30,28,30,4,15,14,2,7,30,28,30,8,21,14,17,24,30,11,0,1,18,30,28,30,11,14,6,8,2,14,12,0,30,28,30,12,0,2,0,20,30,4,23,15,14,17,19,18,30,28,30,12,4,7,20,30,28,30,12,4,17,2,20,17,24,30,28,30,15,4,8,18,8,10,30,28,30,15,17,8,18,12,1,4,8,13,6,18,30);
 
-    float loadingEnd = 10.;
+    float greetsStart = 145.;
     float creditsStart = 165.;
 
     vec2 pp = p;
@@ -121,25 +121,35 @@ void main()
     // characters in the combined SDF, bleeding perf all over the floor
     int windowWidthChars = 20;
     float windowOffset = -30;
-    float speed = uTime < loadingEnd ? 10. : 20.;
-    float cursor = uTime > creditsStart ? -(uTime - creditsStart) * speed : -uTime * speed;
+    float speed = 10.;
+    float cursor = -uTime * speed;
     if (uTime > creditsStart)
+    {
+        speed = 20.;
+        cursor = -(uTime - creditsStart) * speed;
         pp.y += 10;
+    }
+    else if (uTime > greetsStart)
+    {
+        speed = 30.;
+        cursor = -(uTime - greetsStart) * speed;
+        pp.y -= 10;
+    }
     // What character is currently leftmost in the visible window
     float charCursor = cursor / FONT_WIDTH;
     int cursorOffset = int(abs(floor(charCursor)));
     // The floating cursor needs to snap the next character when one goes out of the window
     float drawingCursor = fract(charCursor) * FONT_WIDTH;
     drawingCursor += windowOffset;
-    if (uTime < loadingEnd)
+    if (uTime < greetsStart)
     {
         for (int i = cursorOffset; i < min(cursorOffset + windowWidthChars, CHAR_COUNT_LOADING); ++i)
             renderChar(CHARS_LOADING[i], pp, d, drawingCursor);
     }
     else if (uTime < creditsStart)
     {
-        for (int i = cursorOffset; i < min(cursorOffset + windowWidthChars, CHAR_COUNT_LOREM); ++i)
-            renderChar(CHARS_LOREM[i], pp, d, drawingCursor);
+        for (int i = cursorOffset; i < min(cursorOffset + windowWidthChars, CHAR_COUNT_GREETS); ++i)
+            renderChar(CHARS_GREETS[i], pp, d, drawingCursor);
     }
     else
     {
@@ -147,7 +157,7 @@ void main()
             renderChar(CHARS_CREDITS[i], pp, d, drawingCursor);
     }
 
-    if (uTime < loadingEnd)
+    if (uTime < greetsStart)
         fragColor = vec4(vec3(saturate(1. - (d * 20.))), 1);
     else
         // 0 to alpha for composite
