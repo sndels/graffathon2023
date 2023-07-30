@@ -12,7 +12,7 @@ out vec4 fragColor;
 
 
 vec3 bg(vec3 d) {
-    return mix(vec3(0), vec3(1), d.y);
+    return 0.35*mix(vec3(0.0), vec3(1), d.y) + 0.0 * (sin(uTime*0.5) + 0.5) * vec3(0.3,0.0, 0.0);
 }
 
 float sdRoundBox( vec3 p, vec3 b, float r )
@@ -81,9 +81,9 @@ vec3 shade(vec3 p, vec3 n, vec3 v, float m)
 
     vec3 l = normalize(vec3(1, 1, -1));
 
-    vec3 ret = evalBRDF(n, v, l, mat) / length((p-vec3(0.0, 3.0, 30.0)) * vec3(0.00005));
-    v = -reflect(-v, n);
-    ret += evalBRDF(n, v, l, mat) * bg(v);
+    vec3 ret = evalBRDF(n, v, l, mat); // / length((p-vec3(0.0, 3.0, 30.0)) * vec3(0.00005));
+    l = -reflect(v, n);
+    ret += evalBRDF(n, v, l, mat) * bg(l) * 0.001;
     return ret;
 }
 
