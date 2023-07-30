@@ -109,7 +109,7 @@ vec3 shade(vec3 p, vec3 n, vec3 v, float m)
     Material mat;
     mat.albedo = vec3(0.926,0.721,0.504);
     mat.metallic = 1;
-    mat.roughness = 0.2;
+    mat.roughness = 0.3;
 
     vec3 l = normalize(vec3(1., -.8, -1.));
     vec3 I = 3. * vec3(.553, .903, .078);
@@ -120,7 +120,7 @@ vec3 shade(vec3 p, vec3 n, vec3 v, float m)
     ret += evalBRDF(n, v, l, mat) * I;
 
     vec3 lBg = reflect(-v, n);
-    ret += bg(lBg) * 0.2;
+    ret += bg(lBg) * 0.3;
     return ret;
 }
 
