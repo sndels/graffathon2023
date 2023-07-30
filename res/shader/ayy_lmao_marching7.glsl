@@ -12,7 +12,7 @@ out vec4 fragColor;
 
 
 vec3 bg(vec3 d) {
-    return mix(vec3(0), vec3(1), d.y);
+    return mix(vec3(0), vec3(.953, .603, .078) , d.y * 0.5 + 0.5);
 }
 
 // Returns distance to hit and material index
@@ -66,11 +66,11 @@ vec3 shade(vec3 p, vec3 n, vec3 v, float m)
     Material mat;
     mat.albedo = vec3(0.926,0.721,0.504);
     mat.metallic = 1;
-    mat.roughness = 0.1;
+    mat.roughness = 0.2;
 
     vec3 l = normalize(vec3(1, 1, -1));
-    vec3 ret =  evalBRDF(n, v, l, mat) * vec3(3);
-    ret += bg(-reflect(-v, n)) * 0.1;
+    vec3 ret = evalBRDF(n, v, l, mat) * 3 * vec3(.879, .061, .995);
+    ret += bg(reflect(v, n)) * 0.1;
     return ret;
 }
 
