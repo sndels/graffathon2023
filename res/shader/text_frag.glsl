@@ -131,7 +131,7 @@ void main()
     }
     else if (uTime > greetsStart)
     {
-        speed = 30.;
+        speed = 35.;
         cursor = -(uTime - greetsStart) * speed;
         pp.y -= 10;
     }
