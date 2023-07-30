@@ -16,7 +16,7 @@
 #include "window.hpp"
 
 // Comment out to compile in demo-mode, so close when music stops etc.
-// #define DEMO_MODE
+#define DEMO_MODE
 #ifndef DEMO_MODE
 // Comment out to load sync from files
 //  #define TCPROCKET
