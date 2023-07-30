@@ -24,6 +24,8 @@ layout(location = 4) out vec4 colorFeedback;
 #define ABERR_SAMPLES 16
 #define PI 3.1415926535
 
+uniform float rTextMode;
+
 uniform float rCaberr;
 vec4 sampleSource(sampler2D s, float aberr)
 {
@@ -136,6 +138,14 @@ void main()
         ping = texture(uScenePingColorDepth, texCoord);
         pong = texture(uScenePongColorDepth, texCoord);
     }
+
+    if (rTextMode > .5)
+    {
+        // Assume pong is the text shader that marks 'transparency' as 0 alpha
+        fragColor = vec4(pong.a > 0 ? pong.rgb : ping.rgb, 1);
+        return;
+    }
+
     vec4 pingPrev = texture(uPrevPing, texCoord);
     vec4 pongPrev = texture(uPrevPong, texCoord);
     vec4 flowPrev = 0.4*texture(uFlow, texCoord) +
