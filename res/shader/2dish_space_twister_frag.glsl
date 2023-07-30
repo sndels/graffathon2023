@@ -11,7 +11,7 @@ out vec4 fragColor;
 #define INF (1.0/0.0)
 
 vec3 bg(vec3 d) {
-    return vec3(0.313, .0, .4);
+    return .4 * vec3(0.313, .0, .4);
 }
 
 // Returns distance to hit and material index
@@ -120,7 +120,7 @@ vec3 shade(vec3 p, vec3 n, vec3 v, float m)
     ret += evalBRDF(n, v, l, mat) * I;
 
     vec3 lBg = reflect(-v, n);
-    ret += bg(lBg) * 0.1;
+    ret += bg(lBg) * 0.2;
     return ret;
 }
 
