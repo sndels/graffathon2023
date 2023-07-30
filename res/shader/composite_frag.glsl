@@ -6,6 +6,10 @@
 uniform vec3 dColor;
 uniform float rMix;
 uniform float rFlowFeedback;
+uniform float rFlow;
+uniform float rSaturate;
+uniform float rBlack;
+
 uniform float uMultiplier;
 
 uniform sampler2D uScenePingColorDepth;
@@ -24,9 +28,9 @@ layout(location = 4) out vec4 colorFeedback;
 #define ABERR_SAMPLES 16
 #define PI 3.1415926535
 
-uniform float rTextMode;
+uniform float rTextMode = 0.0;
 
-uniform float rCaberr;
+uniform float rCaberr = 0.01;
 vec4 sampleSource(sampler2D s, float aberr)
 {
     vec2 texCoord = gl_FragCoord.xy / uRes;
@@ -62,6 +66,24 @@ float vectorWeight(vec2 v1, vec2 v2)
     float l = min(v1l / v2l, v2l / v1l);
 
     return l*0.5*(dot(normalize(v1), normalize(v2))+1.0);
+}
+
+vec3 rgb2hsv(vec3 c)
+{
+    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+
+    float d = q.x - min(q.w, q.y);
+    float e = 1.0e-10;
+    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+}
+
+vec3 hsv2rgb(vec3 c)
+{
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
 // f: initial flow value
@@ -122,8 +144,6 @@ void main()
     )
         discard;
 
-
-
     // init noise
     pcg_state = uvec3(gl_FragCoord.xy+uvec2(10, 0), uTime*120);
 
@@ -142,17 +162,21 @@ void main()
     if (rTextMode > .5)
     {
         // Assume pong is the text shader that marks 'transparency' as 0 alpha
-        fragColor = vec4(pong.a > 0 ? pong.rgb : ping.rgb, 1);
+        fragColor = (1.0-rBlack)*vec4(pong.a > 0 ? pong.rgb : ping.rgb, 1);
         return;
     }
 
     vec4 pingPrev = texture(uPrevPing, texCoord);
     vec4 pongPrev = texture(uPrevPong, texCoord);
-    vec4 flowPrev = 0.4*texture(uFlow, texCoord) +
+    vec4 flowPrev = 0.2*texture(uFlow, texCoord) +
         0.15*texture(uFlow, texCoord+vec2(pixelSize.x, 0.0)) +
         0.15*texture(uFlow, texCoord+vec2(0.0, pixelSize.y)) +
         0.15*texture(uFlow, texCoord+vec2(-pixelSize.x, 0.0)) +
-        0.15*texture(uFlow, texCoord+vec2(0.0, -pixelSize.y));
+        0.15*texture(uFlow, texCoord+vec2(0.0, -pixelSize.y)) +
+        0.05*texture(uFlow, texCoord+vec2(pixelSize.x, pixelSize.y)) +
+        0.05*texture(uFlow, texCoord+vec2(pixelSize.x, -pixelSize.y)) +
+        0.05*texture(uFlow, texCoord+vec2(-pixelSize.x, pixelSize.y)) +
+        0.05*texture(uFlow, texCoord+vec2(-pixelSize.x, -pixelSize.y));
 
     // mix factors
     float mixPing = pow(clamp(1.0-rMix*1.8, 0.0, 1.0), 3.0);
@@ -161,25 +185,31 @@ void main()
     float mixFlow = clamp(rMix*1.5-0.25, 0.0, 1.0);
 
     // sample
-    float flowDamping = 0.99;
-    flow.xy = ((1.0-rFlowFeedback)*resampleFlowPing(flowPrev.xy, ping.rgb, 20) +
-        rFlowFeedback*flowPrev.xy)*flowDamping;
-    flow.zw = ((1.0-rFlowFeedback)*resampleFlowPong(flowPrev.zw, pong.rgb, 20) +
-        rFlowFeedback*flowPrev.zw)*flowDamping;
+    float flowDamping = 0.999;
+    float flowFeedback = sqrt(rFlowFeedback);
+    flow.xy = ((1.0-flowFeedback)*resampleFlowPing(flowPrev.xy, ping.rgb, 20) +
+        flowFeedback*flowPrev.xy)*flowDamping;
+    flow.zw = ((1.0-flowFeedback)*resampleFlowPong(flowPrev.zw, pong.rgb, 20) +
+        flowFeedback*flowPrev.zw)*flowDamping;
 
     vec2 f = mix(flow.xy, flow.zw, mixFlow);
-
-    vec3 color = vec3(0);
+    f = normalize(f) * 0.5*(length(flow.xy) + length(flow.zw));
 
     prevPing = ping;
     prevPong = pong;
-    //flow.xy = vec2(0.0, 0.0);//mix(f, flowPrev.xy, 0.95)*0.999;
-    color.rgb = texture(uColorFeedback, texCoord).rgb;
-    colorFeedback = mixPing*ping + mixPong*pong + mixFeedback*texture(uColorFeedback, texCoord+f*rnd01());
 
-    fragColor = vec4(color, 1);
+    vec3 color = mixPing*ping.rgb + mixPong*pong.rgb + mixFeedback*
+        texture(uColorFeedback, texCoord-f*(0.5+0.5*rnd01())*rFlow).rgb;
+    color = rgb2hsv(color);
+    color.y = mix(color.y, 1.0, rSaturate);
+    color = hsv2rgb(color);
+    colorFeedback.rgb = color;
+//    color.rgb = texture(uColorFeedback, texCoord).rgb;
+
+    fragColor = vec4(color*(1.0-rBlack), 1);
+
 //    fragColor = fragColor*0.2 + 0.8*vec4(flow.xy*100.0f+0.5, 0.5, 1);
-//    fragColor = vec4(f*100.0f+0.5, 0.5, 1);
+//    fragColor = vec4(f*10.0f+0.5, 0.5, 1);
     //fragColor = 0.05*vec4(color, 1) + 0.95*texture(uPrevAux, texCoord);
 
 

@@ -221,9 +221,9 @@ vec3 lookAt(vec3 eye, vec3 target, vec3 viewRay) {
           fwd.x,   fwd.y,  fwd.z) * viewRay;
 }
 
-uniform vec3 dCamPos;
+uniform vec3 dCamPos = vec3(1.170, -0.450, 0.080);
 uniform vec3 dCamDir;
-uniform vec3 dCamTarget = vec3(0, 1.5, 0);
+uniform vec3 dCamTarget = vec3(0.540, 2.260, 0);
 
 void main()
 {
