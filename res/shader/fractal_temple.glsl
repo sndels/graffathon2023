@@ -25,6 +25,12 @@ const float bpm = 145.0 / 4;
 float beat = uTime * (bpm / 60);
 float bv = (sin(beat * 4 * 3.1415) + 1) * 30.4;
 
+/*
+rPos = -17.160
+dCamPos = 0.0, 3.630, -1.180
+dCamTarget = 0.0, 3.830, 1.1
+*/
+
 uniform float rPos;
 
 
@@ -136,15 +142,21 @@ vec3 lookAt(vec3 eye, vec3 target, vec3 viewRay) {
           fwd.x,   fwd.y,  fwd.z) * viewRay;
 }
 
-uniform vec3 dCamPos;
-uniform vec3 dCamDir;
-uniform vec3 dCamTarget;
+vec3 dCamPos = vec3(0);
+//vec3 dCamDir;
+vec3 dCamTarget = vec3(0);
 
 void main()
 {
     // Avoid nags if these aren't used
     if (uTime < -1 || uRes.x < -1)
         discard;
+
+    if (uTime > 160.0) {
+        dCamPos = vec3(0.0, 3.630, -1.180);
+        dCamTarget = vec3(0.0, 3.830, 1.1);
+    }
+
 
     // Generate camera ray
     vec3 rd = rayDir(gl_FragCoord.xy);
